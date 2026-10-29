@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { Card, PageHeader } from "@/components/ui";
+import Link from "next/link";
+import { ActionButton } from "@/components/action-button";
+import { buttonClass, Card, PageHeader } from "@/components/ui";
 import { getContext, isOwner } from "@/lib/auth";
 import { signOut } from "../../(auth)/actions";
+import { deleteAccount } from "./actions";
 import { WorkspaceForm } from "./workspace-form";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -19,16 +22,45 @@ export default async function SettingsPage() {
         <Card>
           <h2 className="mb-2 font-semibold">Account</h2>
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-            <dt className="text-slate-600">Email</dt>
+            <dt className="text-ink/60">Email</dt>
             <dd>{ctx.user.email}</dd>
-            <dt className="text-slate-600">Role</dt>
+            <dt className="text-ink/60">Role</dt>
             <dd className="capitalize">{ctx.workspace.role}</dd>
           </dl>
           <form action={signOut} className="mt-4">
-            <button type="submit" className="inline-flex min-h-10 items-center rounded-lg px-4 text-sm font-semibold text-slate-800 ring-1 ring-inset ring-slate-300 hover:bg-slate-50">
+            <button type="submit" className={buttonClass("secondary")}>
               Sign out
             </button>
           </form>
+        </Card>
+        <Card>
+          <h2 className="mb-1 font-semibold">Your data</h2>
+          <p className="text-sm text-ink/70">
+            Download everything in your workspace (products, locations and full movement history) as a JSON file. See the{" "}
+            <Link href="/privacy" className="font-semibold underline">Privacy Policy</Link> for how data is handled.
+          </p>
+          <a href="/api/account/export" download className={buttonClass("secondary", "mt-4")}>
+            Download my data
+          </a>
+        </Card>
+        <Card className="border-coral/40">
+          <h2 className="mb-1 font-semibold text-coral">Delete account</h2>
+          <p className="mb-4 text-sm text-ink/70">
+            Permanently deletes your login and every workspace you own, including all products, locations and stock history. This cannot be
+            undone. Download your data first if you want a copy.
+          </p>
+          <ActionButton
+            action={deleteAccount}
+            label="Delete my account"
+            pendingLabel="Deleting…"
+            variant="danger"
+            confirm={{
+              title: "Delete your account permanently?",
+              body: `This erases ${ctx.user.email}, your workspace “${ctx.workspace.name}” and all of its inventory history. There is no undo.`,
+              confirmLabel: "Yes, delete everything",
+              danger: true,
+            }}
+          />
         </Card>
       </div>
     </>

@@ -10,8 +10,8 @@ export function cx(...classes: (string | false | null | undefined)[]) {
 }
 
 const BUTTON = {
-  primary: "bg-brand-600 text-white hover:bg-brand-700 disabled:bg-brand-600/60",
-  secondary: "bg-white text-slate-800 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 disabled:text-slate-400",
+  primary: "bg-ink text-paper hover:bg-brand-600 disabled:bg-ink/50",
+  secondary: "bg-white text-ink ring-1 ring-inset ring-ink/20 hover:bg-paper-deep disabled:text-slate-400",
   danger: "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-600/60",
   ghost: "text-slate-700 hover:bg-slate-100",
 } as const;
@@ -20,7 +20,7 @@ export type ButtonVariant = keyof typeof BUTTON;
 
 export function buttonClass(variant: ButtonVariant = "primary", extra?: string) {
   return cx(
-    "inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed",
+    "inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-[background-color,color,transform] duration-200 active:scale-[0.97] disabled:cursor-not-allowed",
     BUTTON[variant],
     extra,
   );
@@ -114,7 +114,7 @@ export function PageHeader({ title, description, actions }: { title: string; des
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink">{title}</h1>
         {description && <p className="mt-1 text-sm text-slate-600">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -123,7 +123,7 @@ export function PageHeader({ title, description, actions }: { title: string; des
 }
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <section className={cx("rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5", className)}>{children}</section>;
+  return <section className={cx("rounded-2xl border border-ink/10 bg-white p-4 shadow-[0_1px_0_rgba(19,17,28,0.04)] sm:p-5", className)}>{children}</section>;
 }
 
 export function EmptyState({ title, children, actions }: { title: string; children?: ReactNode; actions?: ReactNode }) {
@@ -138,7 +138,7 @@ export function EmptyState({ title, children, actions }: { title: string; childr
 
 export function LowStockBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">
+    <span className="inline-flex items-center gap-1 rounded-full bg-sun px-2 py-0.5 text-xs font-semibold text-ink">
       <span aria-hidden>▼</span> Low stock
     </span>
   );

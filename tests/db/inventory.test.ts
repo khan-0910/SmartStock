@@ -253,6 +253,34 @@ describe("constraints", () => {
   });
 });
 
+describe("account deletion", () => {
+  it("erases the caller, their workspace and its history, and nothing else", async () => {
+    const DAVE = "00000000-0000-4000-8000-00000000000d";
+    await createUser(db, DAVE);
+    const ws = await as(db, DAVE, async () => (await rows<{ workspace_id: string }>("select * from public.ensure_workspace()"))[0].workspace_id);
+    const p = await newProduct(DAVE, ws, "DAVE-1");
+    await move(DAVE, p, "stock_in", 3);
+    const [{ before }] = await rows<{ before: number }>("select count(*)::int as before from public.products where workspace_id = $1", [bobWs]);
+
+    await as(db, DAVE, () => rows("select public.delete_my_account()"));
+
+    const left = await rows(
+      `select 1 from auth.users where id = $1
+       union all select 1 from public.workspaces where id = $2
+       union all select 1 from public.products where workspace_id = $2
+       union all select 1 from public.stock_movements where workspace_id = $2`,
+      [DAVE, ws],
+    );
+    expect(left).toHaveLength(0);
+    const [{ after }] = await rows<{ after: number }>("select count(*)::int as after from public.products where workspace_id = $1", [bobWs]);
+    expect(after).toBe(before);
+  });
+
+  it("is not callable anonymously", async () => {
+    await expect(as(db, null, () => rows("select public.delete_my_account()"))).rejects.toThrow(/permission denied/);
+  });
+});
+
 describe("demo data", () => {
   it("loads once into an empty workspace through the ledger", async () => {
     const CAROL = "00000000-0000-4000-8000-00000000000c";

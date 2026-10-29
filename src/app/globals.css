@@ -1,12 +1,34 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
+/*
+  SmartStock palette: warm paper + deep ink, with a violet primary and
+  playful coral / lime / sun / teal accents. Every accent is used on ink or
+  paper with enough contrast for its role (text on accents is always ink).
+*/
 @theme {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --color-brand-50: #eef6ff;
-  --color-brand-100: #d9eaff;
-  --color-brand-600: #1f5fd1;
-  --color-brand-700: #1a4fae;
-  --color-brand-800: #173f86;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: var(--font-heading), var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-accent), ui-serif, Georgia, serif;
+
+  --color-ink: #13111c;
+  --color-ink-soft: #2a2638;
+  --color-paper: #fbf6ec;
+  --color-paper-deep: #f3ead8;
+
+  --color-brand-50: #f2efff;
+  --color-brand-100: #e3dcff;
+  --color-brand-600: #5b3df5;
+  --color-brand-700: #4a2ce0;
+  --color-brand-800: #3a20b0;
+
+  --color-coral: #ff5a3c;
+  --color-lime: #d7f75b;
+  --color-sun: #ffc83d;
+  --color-teal: #2ec4b6;
+  --color-lilac: #c9b8ff;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
@@ -14,7 +36,12 @@
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-paper text-ink antialiased;
+}
+
+::selection {
+  background: var(--color-lime);
+  color: var(--color-ink);
 }
 
 /* Visible focus for keyboard users everywhere. */
@@ -23,28 +50,35 @@ body {
   outline-offset: 2px;
 }
 
-/* Landing: elements GSAP reveals start hidden (only when motion is allowed)
-   so there is no flash before hydration. LandingMotion always reveals them. */
-@media (prefers-reduced-motion: no-preference) {
+/*
+  Landing: elements GSAP reveals start hidden so there is no flash before
+  hydration. Only when scripts run and motion is allowed; LandingMotion
+  always reveals them (including the reduced-motion branch).
+*/
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   .landing [data-hero-title],
   .landing [data-hero-fade],
-  .landing [data-hero-mock],
   .landing [data-reveal],
   .landing [data-split] {
     visibility: hidden;
   }
 }
 
-/* Lenis smooth scrolling */
-html.lenis,
-html.lenis body {
-  height: auto;
+/* Nav link label that rolls up on hover (pure CSS, compositor-only). */
+.roll {
+  display: inline-flex;
+  overflow: hidden;
+  height: 1.25em;
+  line-height: 1.25em;
 }
-.lenis:not(.lenis-autoToggle).lenis-stopped {
-  overflow: clip;
+.roll > span {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.45s var(--ease-out-expo);
 }
-.lenis [data-lenis-prevent] {
-  overscroll-behavior: contain;
+.roll:hover > span,
+a:focus-visible .roll > span {
+  transform: translateY(-50%);
 }
 
 @media (prefers-reduced-motion: reduce) {

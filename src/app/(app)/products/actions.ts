@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getContext, isOwner } from "@/lib/auth";
 import { dbErrorCode, friendlyDbError } from "@/lib/errors";
 import { PRODUCT_SELECT } from "@/lib/queries";
+import { rateLimit } from "@/lib/rate-limit";
 import type { ActionState, MovementType, ProductWithLocation } from "@/lib/types";
 import { fieldErrors, formFields, isUuid, movementSchema, normalizeBarcode, productSchema } from "@/lib/validation";
 
@@ -104,6 +105,8 @@ export type MovementResult = {
 export async function recordMovement(_prev: ActionState<MovementResult>, form: FormData): Promise<ActionState<MovementResult>> {
   const ctx = await getContext();
   const raw = formFields(form, ["product_id", "movement_type", "quantity", "reason", "reference", "idempotency_key"]);
+  const wait = rateLimit(`move:${ctx.user.id}`, 120, 60_000);
+  if (wait) return { status: "error", message: `Too many stock changes in a short time. Wait ${wait} seconds.`, values: raw };
   const parsed = movementSchema.safeParse(raw);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the highlighted fields.", fieldErrors: fieldErrors(parsed.error), values: raw };
@@ -151,6 +154,7 @@ export type LookupResult =
 /** Exact barcode lookup in the caller's workspace. Never changes stock. */
 export async function lookupBarcode(rawCode: string): Promise<LookupResult> {
   const ctx = await getContext();
+  if (rateLimit(`lookup:${ctx.user.id}`, 240, 60_000)) return { status: "error", code: "", message: "Too many lookups. Wait a moment and try again." };
   const code = normalizeBarcode(typeof rawCode === "string" ? rawCode : "");
   if (!code) return { status: "error", code, message: "Enter or scan a barcode." };
   if (code.length > 64) return { status: "error", code: code.slice(0, 64), message: "That code is too long to be a barcode." };

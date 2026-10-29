@@ -17,7 +17,9 @@ Status: built and covered by automated database and validation tests. End-to-end
 - [x] Barcode lookup three ways: typed, USB/Bluetooth keyboard-wedge scanner, or phone camera (EAN-13, EAN-8, UPC-A, UPC-E, Code 128)
 - [x] Dashboard: active products, units on hand, inventory value at cost, low-stock count and list, recent movements
 - [x] One-click fictional demo data for empty workspaces
-- [x] Animated public homepage at `/` (GSAP + ScrollTrigger + SplitText, Lenis smooth scroll). Animation is turned off when the visitor prefers reduced motion. Signed-in users go straight to `/dashboard`.
+- [x] Animated public homepage at `/`: a photo deck that shuffles, a pinned image that expands as you scroll, a sideways feature gallery, a pinned how-it-works story and a photo mosaic with wipe reveals (GSAP, ScrollTrigger, SplitText, Lenis and three React Bits components). Animation turns off for visitors who prefer reduced motion. Signed-in users go straight to `/dashboard`.
+- [x] Legal pages: Privacy Policy, Terms, Cookie Policy and Security, plus `robots.txt`, `sitemap.xml`, a web manifest and `/.well-known/security.txt`.
+- [x] Privacy controls: download all workspace data as JSON, and delete your account permanently.
 - [x] Responsive layout, keyboard support, live-region announcements, no meaning conveyed by colour alone
 
 ## Architecture
@@ -74,6 +76,12 @@ Application roles have no `INSERT`/`UPDATE`/`DELETE` grant on `stock_movements` 
 - `anon` has no privileges on any business table.
 - Column-level grants block the browser from setting `quantity_on_hand`, `workspace_id` on update, `created_by`, or anything else that must be trusted.
 - No service-role key is used anywhere. Only `NEXT_PUBLIC_SUPABASE_URL` and the anon/publishable key are needed.
+- Per-request Content-Security-Policy, set in `src/proxy.ts`. Scripts need a fresh nonce (`strict-dynamic`). Styles allow inline, because the dev server, fonts and animation libraries inject `<style>` tags. `frame-ancestors none`, `form-action self`, `object-src none`.
+- Other headers: HSTS (production only), COOP/CORP same-origin, nosniff, a strict referrer policy, and a permissions policy where only the camera is allowed, on this site only.
+- Rate limits (in memory, per server instance): sign-in per IP and per email, sign-up per IP, stock changes and lookups per user, data export and account deletion.
+- New passwords need 10+ characters with a letter and a number. **Also set this in Supabase** (Authentication → Sign In / Providers → Email → minimum password length and password requirements). The anon key is public, so someone could call Supabase Auth directly and skip the app's rules.
+- Recommended in the Supabase dashboard: leaked-password protection, CAPTCHA on sign-up, and email confirmation in production.
+- Legal pages use placeholder operator and contact details. Edit `src/lib/site.ts` (and set `NEXT_PUBLIC_SITE_URL`) before going live, and have the text reviewed for your jurisdiction.
 - Search terms have PostgREST filter syntax stripped before use. All other values go through the client library's parameter handling.
 
 ## Setup
@@ -89,7 +97,7 @@ cp .env.example .env.local   # then fill in your Supabase URL and anon/publishab
 
 Apply the migrations in `supabase/migrations/` **in order**. Pick one way:
 
-- **Supabase SQL editor:** paste and run `20261029000001_init.sql`, then `20261029000002_demo_data.sql`.
+- **Supabase SQL editor:** paste and run `20261029000001_init.sql`, then `20261029000002_demo_data.sql`, then `20261030000003_account_deletion.sql`.
 - **Supabase CLI:** `supabase link --project-ref <ref>` and then `supabase db push`.
 
 ### Auth settings (Supabase dashboard → Authentication)

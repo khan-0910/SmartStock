@@ -58,18 +58,26 @@ export function AuthForm({
           {...describedBy("email", { error: errors?.email })}
         />
       </Field>
-      <Field id="password" label="Password" required error={errors?.password} hint={isLogin ? undefined : "At least 8 characters."}>
+      <Field id="password" label="Password" required error={errors?.password} hint={isLogin ? undefined : "At least 10 characters, with at least one letter and one number."}>
         <input
           id="password"
           name="password"
           type="password"
           autoComplete={isLogin ? "current-password" : "new-password"}
           required
-          minLength={8}
+          minLength={isLogin ? undefined : 10}
+          maxLength={72}
           className={inputClass}
           {...describedBy("password", { hint: !isLogin, error: errors?.password })}
         />
       </Field>
+      {!isLogin && (
+        <p className="text-xs text-ink/60">
+          By creating an account you agree to the{" "}
+          <Link href="/terms" className="font-semibold underline">Terms of Service</Link> and confirm you have read the{" "}
+          <Link href="/privacy" className="font-semibold underline">Privacy Policy</Link>.
+        </p>
+      )}
       <SubmitButton className="w-full" pendingLabel={isLogin ? "Signing in…" : "Creating account…"}>
         {isLogin ? "Sign in" : "Create account"}
       </SubmitButton>

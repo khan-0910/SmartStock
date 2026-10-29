@@ -8,8 +8,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { next, error } = await searchParams;
   return (
     <>
-      <h1 className="mb-1 text-lg font-semibold">Sign in</h1>
-      <p className="mb-5 text-sm text-slate-600">Manage your stock, locations and movement history.</p>
+      <h1 className="mb-1 font-display text-3xl font-extrabold tracking-tight">Sign in</h1>
+      <p className="mb-5 text-sm text-ink/60">Manage your stock, locations and movement history.</p>
       <AuthForm
         mode="login"
         action={signIn}

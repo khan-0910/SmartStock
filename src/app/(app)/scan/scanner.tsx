@@ -134,7 +134,7 @@ export function Scanner() {
             }}
             className="space-y-3"
           >
-            <label htmlFor="barcode" className="block text-sm font-medium text-slate-800">
+            <label htmlFor="barcode" className="block text-sm font-medium text-ink/80">
               Barcode
             </label>
             <div className="flex gap-2">
@@ -154,7 +154,7 @@ export function Scanner() {
                 {pending ? "Looking…" : "Look up"}
               </Button>
             </div>
-            <p id="barcode-hint" className="text-xs text-slate-500">
+            <p id="barcode-hint" className="text-xs text-ink/60">
               Type or paste a code and press Enter. USB and Bluetooth scanners work here too: keep this field focused and scan.
             </p>
           </form>
@@ -164,7 +164,7 @@ export function Scanner() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="font-semibold">Camera</h2>
-              <p className="text-xs text-slate-500">Reads {SUPPORTED_FORMATS.join(", ")}.</p>
+              <p className="text-xs text-ink/60">Reads {SUPPORTED_FORMATS.join(", ")}.</p>
             </div>
             {camera === "off" ? (
               <Button type="button" variant="secondary" onClick={startCamera}>
@@ -177,7 +177,7 @@ export function Scanner() {
             )}
           </div>
           {camera === "off" && !cameraError && (
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-ink/60">
               Your browser will ask for camera permission. Video stays on this device; nothing is recorded or uploaded.
             </p>
           )}
@@ -201,7 +201,7 @@ export function Scanner() {
           {announce}
         </p>
         {!result && (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-600">
+          <div className="rounded-xl border border-dashed border-ink/10 bg-white p-8 text-center text-sm text-ink/60">
             Scan or enter a barcode to find a product. Scanning only selects the product; stock changes need your confirmation.
           </div>
         )}
@@ -213,8 +213,8 @@ export function Scanner() {
         {result?.status === "not_found" && (
           <Card>
             <h2 className="font-semibold">No product found</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Nothing in this workspace has barcode <span className="font-mono font-semibold text-slate-900">{result.code}</span>.
+            <p className="mt-1 text-sm text-ink/60">
+              Nothing in this workspace has barcode <span className="font-mono font-semibold text-ink">{result.code}</span>.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <LinkButton href={`/products/new?barcode=${encodeURIComponent(result.code)}`}>Create product with this barcode</LinkButton>
@@ -228,13 +228,13 @@ export function Scanner() {
           <Card>
             <div className="mb-4 flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Match for {result.code}</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-ink/60">Match for {result.code}</p>
                 <h2 className="text-lg font-semibold">
                   <Link href={`/products/${result.product.id}`} className="hover:underline">
                     {result.product.name}
                   </Link>
                 </h2>
-                <p className="text-sm text-slate-600">SKU {result.product.sku}</p>
+                <p className="text-sm text-ink/60">SKU {result.product.sku}</p>
                 <div className="mt-1 flex gap-1">
                   {result.product.is_low_stock && <LowStockBadge />}
                   {!result.product.is_active && <StatusBadge active={false} />}
@@ -242,7 +242,7 @@ export function Scanner() {
               </div>
               <div className="shrink-0 text-right">
                 <p className="text-2xl font-bold tabular-nums">{formatInt(result.product.quantity_on_hand)}</p>
-                <p className="text-xs text-slate-500">{result.product.unit} on hand</p>
+                <p className="text-xs text-ink/60">{result.product.unit} on hand</p>
               </div>
             </div>
             <StockMovementForm
@@ -262,7 +262,7 @@ export function Scanner() {
                 )
               }
             />
-            <div className="mt-4 border-t border-slate-100 pt-4">
+            <div className="mt-4 border-t border-ink/10 pt-4">
               <Button type="button" variant="secondary" onClick={reset}>
                 Scan another
               </Button>

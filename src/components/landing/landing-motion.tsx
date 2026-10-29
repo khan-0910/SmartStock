@@ -105,7 +105,7 @@ export function LandingMotion({ children, className }: { children: React.ReactNo
           }
 
           // ---- Hero intro
-          const hero = one("[data-hero]")!;
+          const hero = one("[data-hero]");
           const title = one("[data-hero-title]");
           if (title) {
             SplitText.create(title, {
@@ -121,83 +121,86 @@ export function LandingMotion({ children, className }: { children: React.ReactNo
           const intro = gsap.timeline({ defaults: { ease: "expo.out", duration: 1.1 } });
           intro.fromTo(q("[data-hero-fade]"), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, stagger: 0.08 }, 0.35);
 
-          // Photo deck: cards fly up into a fan, then shuffle on a loop.
-          const cards = q("[data-deck-card]") as HTMLElement[];
-          let order = [...cards];
-          const restack = () => order.forEach((c, i) => gsap.set(c, { zIndex: order.length - i }));
-          gsap.set(cards, { yPercent: 70, rotation: 0, scale: 0.7, autoAlpha: 0, transformOrigin: "50% 100%" });
-          order.forEach((c, i) => intro.to(c, { ...FAN[i], autoAlpha: 1, duration: 1.4 }, 0.45 + (order.length - i) * 0.09));
-          intro.from(q("[data-sticker]"), { scale: 0, rotation: -30, autoAlpha: 0, duration: 0.8, ease: "back.out(2.2)", stagger: 0.1 }, 1.1);
-
-          let shuffling = false;
-          const shuffle = () => {
-            if (shuffling || order.length < 2) return;
-            shuffling = true;
-            const top = order[0];
-            const rest = order.slice(1);
-            const tl = gsap.timeline({ onComplete: () => void (shuffling = false) });
-            tl.to(top, { xPercent: 120, yPercent: -8, rotation: 28, duration: 0.55, ease: "power3.in" })
-              .add(() => {
-                order = [...rest, top];
-                restack();
-              })
-              .to(top, { ...FAN[order.length - 1], duration: 0.8, ease: "power3.out" });
-            rest.forEach((c, i) => tl.to(c, { ...FAN[i], duration: 0.75, ease: "back.out(1.6)" }, 0.3));
-          };
-          // A repeating empty tween is an easy, pausable metronome.
-          const deckClock = gsap.to({}, { duration: 3, repeat: -1, onRepeat: shuffle, delay: 2.4 });
-          const deck = one("[data-deck]");
-          if (deck) {
-            on(deck, "pointerenter", () => deckClock.pause());
-            on(deck, "pointerleave", () => deckClock.resume());
-            on(deck, "click", shuffle);
-          }
-
-          // Stickers: gentle bob (yPercent) + pointer parallax (x/y), so they never fight.
-          const stickers = q("[data-sticker]") as HTMLElement[];
-          const bobs = stickers.map((s, i) =>
-            gsap.to(s, { yPercent: -18, rotation: `+=${i % 2 ? 4 : -4}`, duration: 2 + i * 0.35, ease: "sine.inOut", repeat: -1, yoyo: true }),
-          );
-          if (finePointer) {
-            const movers = stickers.map((s) => ({
-              depth: Number(s.dataset.depth ?? 1),
-              x: gsap.quickTo(s, "x", { duration: 0.9, ease: "power3" }),
-              y: gsap.quickTo(s, "y", { duration: 0.9, ease: "power3" }),
-            }));
-            on(hero, "pointermove", (e) => {
-              const r = hero.getBoundingClientRect();
-              const px = (e.clientX - r.left) / r.width - 0.5;
-              const py = (e.clientY - r.top) / r.height - 0.5;
-              movers.forEach((m) => {
-                m.x(px * 40 * m.depth);
-                m.y(py * 30 * m.depth);
+          if (hero) {
+            // Photo deck: cards fly up into a fan, then shuffle on a loop.
+            const cards = q("[data-deck-card]") as HTMLElement[];
+            let order = [...cards];
+            const restack = () => order.forEach((c, i) => gsap.set(c, { zIndex: order.length - i }));
+            gsap.set(cards, { yPercent: 70, rotation: 0, scale: 0.7, autoAlpha: 0, transformOrigin: "50% 100%" });
+            order.forEach((c, i) => intro.to(c, { ...FAN[i], autoAlpha: 1, duration: 1.4 }, 0.45 + (order.length - i) * 0.09));
+            intro.from(q("[data-sticker]"), { scale: 0, rotation: -30, autoAlpha: 0, duration: 0.8, ease: "back.out(2.2)", stagger: 0.1 }, 1.1);
+  
+            let shuffling = false;
+            const shuffle = () => {
+              if (shuffling || order.length < 2) return;
+              shuffling = true;
+              const top = order[0];
+              const rest = order.slice(1);
+              const tl = gsap.timeline({ onComplete: () => void (shuffling = false) });
+              tl.to(top, { xPercent: 120, yPercent: -8, rotation: 28, duration: 0.55, ease: "power3.in" })
+                .add(() => {
+                  order = [...rest, top];
+                  restack();
+                })
+                .to(top, { ...FAN[order.length - 1], duration: 0.8, ease: "power3.out" });
+              rest.forEach((c, i) => tl.to(c, { ...FAN[i], duration: 0.75, ease: "back.out(1.6)" }, 0.3));
+            };
+            // A repeating empty tween is an easy, pausable metronome.
+            const deckClock = gsap.to({}, { duration: 3, repeat: -1, onRepeat: shuffle, delay: 2.4 });
+            const deck = one("[data-deck]");
+            if (deck) {
+              on(deck, "pointerenter", () => deckClock.pause());
+              on(deck, "pointerleave", () => deckClock.resume());
+              on(deck, "click", shuffle);
+            }
+  
+            // Stickers: gentle bob (yPercent) + pointer parallax (x/y), so they never fight.
+            const stickers = q("[data-sticker]") as HTMLElement[];
+            const bobs = stickers.map((s, i) =>
+              gsap.to(s, { yPercent: -18, rotation: `+=${i % 2 ? 4 : -4}`, duration: 2 + i * 0.35, ease: "sine.inOut", repeat: -1, yoyo: true }),
+            );
+            if (finePointer) {
+              const movers = stickers.map((s) => ({
+                depth: Number(s.dataset.depth ?? 1),
+                x: gsap.quickTo(s, "x", { duration: 0.9, ease: "power3" }),
+                y: gsap.quickTo(s, "y", { duration: 0.9, ease: "power3" }),
+              }));
+              on(hero, "pointermove", (e) => {
+                const r = hero.getBoundingClientRect();
+                const px = (e.clientX - r.left) / r.width - 0.5;
+                const py = (e.clientY - r.top) / r.height - 0.5;
+                movers.forEach((m) => {
+                  m.x(px * 40 * m.depth);
+                  m.y(py * 30 * m.depth);
+                });
               });
+            }
+  
+            // Pause hero loops while the hero is off screen.
+            const heroLoops = [deckClock, ...bobs];
+            ScrollTrigger.create({
+              trigger: hero,
+              start: "top bottom",
+              end: "bottom top",
+              onToggle: (self) => heroLoops.forEach((t) => (self.isActive ? t.resume() : t.pause())),
             });
+  
+            // Scroll away: copy drifts up, deck tilts back.
+            gsap.to(one("[data-hero-copy]") ?? [], {
+              yPercent: -12,
+              autoAlpha: 0.2,
+              ease: "none",
+              scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true },
+            });
+            gsap.to(one("[data-deck-wrap]") ?? [], {
+              yPercent: 14,
+              rotation: -6,
+              scale: 0.9,
+              ease: "none",
+              scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true },
+            });
+  
           }
-
-          // Pause hero loops while the hero is off screen.
-          const heroLoops = [deckClock, ...bobs];
-          ScrollTrigger.create({
-            trigger: hero,
-            start: "top bottom",
-            end: "bottom top",
-            onToggle: (self) => heroLoops.forEach((t) => (self.isActive ? t.resume() : t.pause())),
-          });
-
-          // Scroll away: copy drifts up, deck tilts back.
-          gsap.to(one("[data-hero-copy]") ?? [], {
-            yPercent: -12,
-            autoAlpha: 0.2,
-            ease: "none",
-            scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true },
-          });
-          gsap.to(one("[data-deck-wrap]") ?? [], {
-            yPercent: 14,
-            rotation: -6,
-            scale: 0.9,
-            ease: "none",
-            scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true },
-          });
 
           // ---- Scroll-expand photo: framed card grows to full bleed (pinned)
           const expand = one("[data-expand]");
@@ -209,6 +212,35 @@ export function LandingMotion({ children, className }: { children: React.ReactNo
               .fromTo(one("[data-expand-frame]") ?? [], { clipPath: "inset(12% 8% round 2rem)" }, { clipPath: "inset(0% 0% round 0rem)", ease: "none" }, 0)
               .fromTo(one("[data-expand-img]") ?? [], { scale: 1.35 }, { scale: 1, ease: "none" }, 0)
               .from(q("[data-expand-kicker], [data-expand-title]"), { yPercent: 80, autoAlpha: 0, stagger: 0.12, ease: "power3.out", duration: 0.4 }, 0.45);
+          }
+
+
+          // ---- Security layers: plates spread apart while each layer is explained (pinned)
+          const layerScene = one("[data-layers]");
+          const plates = q("[data-plate]") as HTMLElement[];
+          const notes = q("[data-layer-note]") as HTMLElement[];
+          if (layerScene && plates.length && notes.length === plates.length) {
+            const n = plates.length;
+            if (desktop) {
+              gsap.set(plates, { y: (i: number) => (n - 1 - i) * -14 });
+              gsap.set(notes.slice(1), { opacity: 0.25, x: 12 });
+              const lt = gsap.timeline({
+                defaults: { ease: "power2.inOut" },
+                scrollTrigger: { trigger: layerScene, start: "top top", end: () => `+=${window.innerHeight * 2}`, pin: true, scrub: 0.7, invalidateOnRefresh: true },
+              });
+              lt.to(plates, { y: (i: number) => (n - 1 - i) * -72, duration: 1 }, 0).to(plates[0], { scale: 1.06, duration: 0.3 }, 0.6);
+              notes.forEach((note, i) => {
+                if (i === 0) return;
+                const at = 0.9 + (i - 1) * 0.6;
+                lt.to(notes[i - 1], { opacity: 0.25, x: 12, duration: 0.25 }, at)
+                  .to(plates[i - 1], { scale: 1, duration: 0.25 }, at)
+                  .to(note, { opacity: 1, x: 0, duration: 0.25 }, at)
+                  .to(plates[i], { scale: 1.06, duration: 0.25 }, at);
+              });
+              lt.to({}, { duration: 0.4 });
+            } else {
+              gsap.set(plates, { y: (i: number) => (n - 1 - i) * -56 });
+            }
           }
 
           // ---- Features: horizontal scroll on desktop, reveal on smaller screens

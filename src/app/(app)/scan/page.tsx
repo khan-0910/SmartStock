@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Scan" };
 export default function ScanPage() {
   return (
     <>
-      <PageHeader title="Scan barcode" description="Find a product by barcode, then record stock in, stock out or an adjustment." />
+      <PageHeader title="Scan barcode" kicker="Barcode lookup" description="Find a product by barcode, then record stock in, stock out or an adjustment." />
       <Scanner />
     </>
   );

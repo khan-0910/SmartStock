@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiteFooter } from "./site-footer";
+import { SmoothScroll } from "./smooth-scroll";
 import { site } from "@/lib/site";
 
 /** Shared shell for Privacy, Terms, Cookies and Security pages. */
@@ -15,6 +16,7 @@ export function LegalPage({
 }) {
   return (
     <div className="min-h-dvh bg-paper">
+      <SmoothScroll />
       <header className="border-b border-ink/10">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
@@ -28,9 +30,12 @@ export function LegalPage({
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+      <main className="page-enter stagger mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
         <p className="text-sm font-semibold tracking-wide text-brand-600 uppercase">Legal</p>
-        <h1 className="mt-2 font-display text-5xl font-bold tracking-tight sm:text-6xl">{title}</h1>
+        <h1 className="mt-2 font-display text-5xl font-extrabold tracking-[-0.04em] sm:text-7xl">
+          {title}
+          <span aria-hidden className="text-coral">.</span>
+        </h1>
         <p className="mt-3 text-sm text-ink/60">Last updated {site.legalUpdated}</p>
         <div className="mt-6 max-w-3xl text-lg leading-relaxed text-ink/80">{intro}</div>
 
@@ -47,7 +52,7 @@ export function LegalPage({
               ))}
             </ol>
           </nav>
-          <div className="max-w-3xl space-y-12">
+          <div className="stagger-children max-w-3xl space-y-12">
             {sections.map((s, i) => (
               <section key={s.id} id={s.id} className="scroll-mt-8">
                 <h2 className="font-display text-2xl font-bold tracking-tight">

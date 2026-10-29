@@ -7,6 +7,7 @@ import RotatingText from "@/components/react-bits/RotatingText";
 import ScrollVelocity from "@/components/react-bits/ScrollVelocity";
 import { SiteFooter } from "@/components/site-footer";
 import { photos } from "@/lib/site";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: { absolute: "SmartStock: inventory that never disagrees with itself" },
@@ -95,6 +96,12 @@ const GALLERY = [
 
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ account?: string }> }) {
   const { account } = await searchParams;
+  // Signed-in visitors still see the homepage, with buttons pointing into the app.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const primary = user ? { href: "/dashboard", label: "Open dashboard" } : { href: "/signup", label: "Start free" };
   return (
     <LandingMotion className="landing min-h-dvh overflow-x-clip bg-paper text-ink">
       {account === "deleted" && (
@@ -133,11 +140,16 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             ))}
           </ul>
           <div className="flex items-center gap-1">
-            <Link href="/login" className="hidden rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap text-ink/80 hover:text-ink sm:inline-flex">
-              Sign in
-            </Link>
-            <Link href="/signup" className="rounded-full bg-ink px-4 py-2 text-sm font-semibold whitespace-nowrap text-paper transition-colors hover:bg-brand-600">
-              Get started
+            {!user && (
+              <Link href="/login" className="hidden rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap text-ink/80 hover:text-ink sm:inline-flex">
+                Sign in
+              </Link>
+            )}
+            <Link
+              href={user ? "/dashboard" : "/signup"}
+              className="rounded-full bg-ink px-4 py-2 text-sm font-semibold whitespace-nowrap text-paper transition-colors hover:bg-brand-600"
+            >
+              {user ? "Open dashboard" : "Get started"}
             </Link>
           </div>
         </nav>
@@ -176,10 +188,10 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
               <div data-hero-fade className="mt-9 flex flex-wrap items-center gap-3">
                 <Link
                   data-magnetic
-                  href="/signup"
+                  href={primary.href}
                   className="group inline-flex h-13 items-center gap-2 rounded-full bg-coral px-7 text-base font-bold text-ink shadow-[0_10px_0_0_var(--color-ink)] transition-[box-shadow,translate] hover:translate-y-0.5 hover:shadow-[0_6px_0_0_var(--color-ink)]"
                 >
-                  Start free
+                  {primary.label}
                   <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </Link>
                 <a data-magnetic href="#how" className="inline-flex h-13 items-center rounded-full border-2 border-ink px-7 text-base font-bold hover:bg-ink hover:text-paper">
@@ -505,14 +517,16 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <div data-reveal className="mt-10 flex flex-wrap justify-center gap-3">
             <Link
               data-magnetic
-              href="/signup"
+              href={primary.href}
               className="inline-flex h-13 items-center rounded-full bg-ink px-8 text-base font-bold text-paper shadow-[0_8px_0_0_var(--color-paper)] transition-[box-shadow,translate] hover:translate-y-0.5 hover:shadow-[0_4px_0_0_var(--color-paper)]"
             >
-              Get started free
+              {user ? "Open dashboard" : "Get started free"}
             </Link>
-            <Link data-magnetic href="/login" className="inline-flex h-13 items-center rounded-full border-2 border-ink px-8 text-base font-bold hover:bg-ink hover:text-paper">
-              Sign in
-            </Link>
+            {!user && (
+              <Link data-magnetic href="/login" className="inline-flex h-13 items-center rounded-full border-2 border-ink px-8 text-base font-bold hover:bg-ink hover:text-paper">
+                Sign in
+              </Link>
+            )}
           </div>
         </section>
       </main>

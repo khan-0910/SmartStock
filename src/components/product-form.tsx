@@ -71,7 +71,7 @@ export function ProductForm({
       )}
 
       <fieldset className="grid gap-4 sm:grid-cols-2">
-        <legend className="mb-2 text-sm font-semibold text-slate-900">Identity</legend>
+        <legend className="mb-2 text-sm font-semibold text-ink">Identity</legend>
         <div className="sm:col-span-2">{text("name", "Product name", { required: true, maxLength: 200 })}</div>
         {text("sku", "SKU", { required: true, maxLength: 64, hint: "Your internal code. Unique in this workspace; not case-sensitive." })}
         {text("barcode", "Barcode", {
@@ -95,7 +95,7 @@ export function ProductForm({
       </fieldset>
 
       <fieldset className="grid gap-4 sm:grid-cols-2">
-        <legend className="mb-2 text-sm font-semibold text-slate-900">Stock settings</legend>
+        <legend className="mb-2 text-sm font-semibold text-ink">Stock settings</legend>
         {text("unit", "Unit", { required: true, maxLength: 20, hint: "How you count it: each, box, roll, pair…" })}
         {text("reorder_level", "Reorder level", {
           required: true,
@@ -134,18 +134,18 @@ export function ProductForm({
             </select>
           </Field>
         </div>
-        <p className="text-xs text-slate-500 sm:col-span-2">
+        <p className="text-xs text-ink/60 sm:col-span-2">
           Quantity is not edited here. Use stock in, stock out or adjustment on the product page so every change is recorded.
         </p>
       </fieldset>
 
       <fieldset className="grid gap-4 sm:grid-cols-2">
-        <legend className="mb-2 text-sm font-semibold text-slate-900">Pricing</legend>
+        <legend className="mb-2 text-sm font-semibold text-ink">Pricing</legend>
         {text("cost_price", "Cost price (USD)", { inputMode: "decimal", hint: "Used for inventory value. Leave blank if unknown." })}
         {text("selling_price", "Selling price (USD)", { inputMode: "decimal" })}
       </fieldset>
 
-      <div className="flex flex-wrap gap-2 border-t border-slate-200 pt-4">
+      <div className="flex flex-wrap gap-2 border-t border-ink/10 pt-4">
         <SubmitButton pendingLabel="Saving…">{product ? "Save changes" : "Create product"}</SubmitButton>
         <LinkButton href={cancelHref} variant="secondary">
           Cancel

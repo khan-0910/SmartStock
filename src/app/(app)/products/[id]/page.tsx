@@ -70,16 +70,16 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="space-y-6 lg:col-span-2">
           <Card>
-            <p className="text-sm font-medium text-slate-600">On hand</p>
+            <p className="text-sm font-medium text-ink/60">On hand</p>
             <p className="mt-1 text-4xl font-bold tabular-nums">
-              {formatInt(product.quantity_on_hand)} <span className="text-lg font-medium text-slate-500">{product.unit}</span>
+              {formatInt(product.quantity_on_hand)} <span className="text-lg font-medium text-ink/60">{product.unit}</span>
             </p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-ink/60">
               Reorder level: {formatInt(product.reorder_level)}
               {product.reorder_level === 0 && " (alerts off)"}
             </p>
-            <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 border-t border-slate-100 pt-4 text-sm">
-              <dt className="text-slate-600">Location</dt>
+            <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 border-t border-ink/10 pt-4 text-sm">
+              <dt className="text-ink/60">Location</dt>
               <dd>
                 {product.location ? (
                   <>
@@ -87,23 +87,23 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
                     {!product.location.is_active && <span className="text-amber-700"> (inactive)</span>}
                   </>
                 ) : (
-                  <span className="text-slate-500">Not set</span>
+                  <span className="text-ink/60">Not set</span>
                 )}
               </dd>
-              <dt className="text-slate-600">Barcode</dt>
-              <dd className="font-mono text-xs leading-5">{product.barcode ?? <span className="font-sans text-slate-500">None</span>}</dd>
-              <dt className="text-slate-600">Cost price</dt>
+              <dt className="text-ink/60">Barcode</dt>
+              <dd className="font-mono text-xs leading-5">{product.barcode ?? <span className="font-sans text-ink/60">None</span>}</dd>
+              <dt className="text-ink/60">Cost price</dt>
               <dd>{formatMoney(product.cost_price)}</dd>
-              <dt className="text-slate-600">Selling price</dt>
+              <dt className="text-ink/60">Selling price</dt>
               <dd>{formatMoney(product.selling_price)}</dd>
             </dl>
-            {product.description && <p className="mt-4 whitespace-pre-line border-t border-slate-100 pt-4 text-sm text-slate-700">{product.description}</p>}
+            {product.description && <p className="mt-4 whitespace-pre-line border-t border-ink/10 pt-4 text-sm text-ink/80">{product.description}</p>}
           </Card>
 
           {owner && (
             <Card>
               <h2 className="text-sm font-semibold">{product.is_active ? "Archive product" : "Restore product"}</h2>
-              <p className="mb-3 mt-1 text-sm text-slate-600">
+              <p className="mb-3 mt-1 text-sm text-ink/60">
                 {product.is_active
                   ? "Archived products are hidden from the active list and cannot receive stock changes. History is kept."
                   : "Restoring makes the product active again so stock can be recorded."}
@@ -153,7 +153,7 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
           </Link>
         </div>
         {moves.length === 0 ? (
-          <p className="text-sm text-slate-600">No movements yet. Record the opening balance with a stock in.</p>
+          <p className="text-sm text-ink/60">No movements yet. Record the opening balance with a stock in.</p>
         ) : (
           <MovementTable movements={moves} currentUserId={ctx.user.id} showProduct={false} />
         )}

@@ -48,7 +48,7 @@ export default async function MovementsPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader title="Movement history" description="Every stock change, newest first. Records cannot be edited or deleted; corrections are new adjustments." />
+      <PageHeader title="Movement history" kicker="Ledger" description="Every stock change, newest first. Records cannot be edited or deleted; corrections are new adjustments." />
 
       <Card className="mb-4">
         <form role="search" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto_auto_auto] lg:items-end">
@@ -94,7 +94,7 @@ export default async function MovementsPage({ searchParams }: { searchParams: Pr
           </div>
         </form>
         {productId && (
-          <p className="mt-3 text-sm text-slate-700">
+          <p className="mt-3 text-sm text-ink/80">
             Showing movements for <strong>{productName ?? "one product"}</strong>.{" "}
             <Link href={`/movements${qs({ ...filters, product: undefined })}`} className="font-semibold text-brand-700 hover:underline">
               Show all products

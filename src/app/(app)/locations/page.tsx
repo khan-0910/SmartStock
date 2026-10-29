@@ -30,7 +30,7 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
   return (
     <>
       <PageHeader
-        title="Locations"
+        title="Locations" kicker="Storage"
         description="Where products are stored. Each product has one primary location. Locations are deactivated, never deleted, so history stays intact."
       />
 
@@ -61,7 +61,7 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
         <EmptyState title="No locations yet">Add your first storage location above, such as a shelf or bin code like A-01-03.</EmptyState>
       ) : (
         <Card className="p-0 sm:p-0">
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-ink/10">
             {locations.map((l) => {
               const productCount = l.products?.[0]?.count ?? 0;
               return (
@@ -69,11 +69,11 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-sm font-semibold">{l.code}</span>
-                      <span className="text-sm text-slate-900">{l.name}</span>
+                      <span className="text-sm text-ink">{l.name}</span>
                       <StatusBadge active={l.is_active} inactiveLabel="Inactive" />
                     </div>
-                    {l.description && <p className="mt-1 text-sm text-slate-600">{l.description}</p>}
-                    <p className="mt-1 text-xs text-slate-500">
+                    {l.description && <p className="mt-1 text-sm text-ink/60">{l.description}</p>}
+                    <p className="mt-1 text-xs text-ink/60">
                       {productCount > 0 ? (
                         <Link href={`/products${qs({ location: l.id, status: "all" })}`} className="hover:underline">
                           {productCount} product{productCount === 1 ? "" : "s"} stored here

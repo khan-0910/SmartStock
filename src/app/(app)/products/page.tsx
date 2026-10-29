@@ -37,7 +37,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <PageHeader
-        title="Products"
+        title="Products" kicker="Catalog"
         description="Search by name, SKU or barcode."
         actions={
           <>
@@ -84,7 +84,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </div>
         </form>
         {locationId && (
-          <p className="mt-3 text-sm text-slate-700">
+          <p className="mt-3 text-sm text-ink/80">
             Showing products stored at <strong>{locationCode ?? "one location"}</strong>.{" "}
             <Link href={`/products${qs({ ...filters, location: undefined })}`} className="font-semibold text-brand-700 hover:underline">
               Show all locations
@@ -126,7 +126,7 @@ function ProductList({ products, back }: { products: ProductWithLocation[]; back
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-left text-sm">
           <caption className="sr-only">Products</caption>
-          <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+          <thead className="border-b border-ink/10 text-xs uppercase tracking-wide text-ink/60">
             <tr>
               <th scope="col" className="px-4 py-3 font-medium">Product</th>
               <th scope="col" className="px-4 py-3 font-medium">Barcode</th>
@@ -135,25 +135,25 @@ function ProductList({ products, back }: { products: ProductWithLocation[]; back
               <th scope="col" className="px-4 py-3 font-medium">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-ink/10">
             {products.map((p) => (
-              <tr key={p.id} className="hover:bg-slate-50">
+              <tr key={p.id} className="transition-colors duration-200 hover:bg-lime/25">
                 <td className="px-4 py-3">
-                  <Link href={href(p.id)} className="font-medium text-slate-900 hover:underline">
+                  <Link href={href(p.id)} className="font-medium text-ink hover:underline">
                     {p.name}
                   </Link>
-                  <div className="text-xs text-slate-500">SKU {p.sku}</div>
+                  <div className="text-xs text-ink/60">SKU {p.sku}</div>
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-slate-700">{p.barcode ?? "—"}</td>
-                <td className="px-4 py-3 text-slate-700">{p.location?.code ?? "—"}</td>
+                <td className="px-4 py-3 font-mono text-xs text-ink/80">{p.barcode ?? "—"}</td>
+                <td className="px-4 py-3 text-ink/80">{p.location?.code ?? "—"}</td>
                 <td className="px-4 py-3 text-right tabular-nums">
-                  <span className="font-semibold">{formatInt(p.quantity_on_hand)}</span> <span className="text-slate-500">{p.unit}</span>
+                  <span className="font-semibold">{formatInt(p.quantity_on_hand)}</span> <span className="text-ink/60">{p.unit}</span>
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-1">
                     {p.is_low_stock && <LowStockBadge />}
                     {!p.is_active && <StatusBadge active={false} />}
-                    {p.is_active && !p.is_low_stock && <span className="text-xs text-slate-500">OK</span>}
+                    {p.is_active && !p.is_low_stock && <span className="text-xs text-ink/60">OK</span>}
                   </div>
                 </td>
               </tr>
@@ -161,13 +161,13 @@ function ProductList({ products, back }: { products: ProductWithLocation[]; back
           </tbody>
         </table>
       </div>
-      <ul className="divide-y divide-slate-100 md:hidden">
+      <ul className="divide-y divide-ink/10 md:hidden">
         {products.map((p) => (
           <li key={p.id}>
-            <Link href={href(p.id)} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50">
+            <Link href={href(p.id)} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-paper">
               <div className="min-w-0">
                 <p className="truncate font-medium">{p.name}</p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-ink/60">
                   {p.sku}
                   {p.location ? ` · ${p.location.code}` : ""}
                 </p>
@@ -178,7 +178,7 @@ function ProductList({ products, back }: { products: ProductWithLocation[]; back
               </div>
               <p className="shrink-0 text-right tabular-nums">
                 <span className="text-lg font-semibold">{formatInt(p.quantity_on_hand)}</span>
-                <span className="block text-xs text-slate-500">{p.unit}</span>
+                <span className="block text-xs text-ink/60">{p.unit}</span>
               </p>
             </Link>
           </li>

@@ -109,7 +109,7 @@ export function StockMovementForm({
 
   return (
     <div className="space-y-4">
-      <div role="radiogroup" aria-label="Movement type" className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1">
+      <div role="radiogroup" aria-label="Movement type" className="grid grid-cols-3 gap-1 rounded-full border-2 border-ink/10 bg-paper-deep p-1">
         {TYPES.map((t) => (
           <button
             key={t}
@@ -118,8 +118,8 @@ export function StockMovementForm({
             aria-checked={type === t}
             onClick={() => switchType(t)}
             className={cx(
-              "min-h-10 rounded-md px-2 text-sm font-semibold",
-              type === t ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900",
+              "min-h-10 rounded-full px-2 text-sm font-bold transition-colors duration-200",
+              type === t ? "bg-ink text-lime shadow-sm" : "text-ink/60 hover:bg-white/70 hover:text-ink",
             )}
           >
             {t === "adjustment" ? "Adjust" : MOVEMENT_LABELS[t]}
@@ -153,9 +153,9 @@ export function StockMovementForm({
 
         {step === "edit" ? (
           <>
-            <p className="text-sm text-slate-600">
-              Current quantity: <strong className="text-slate-900">{formatInt(current)}</strong> {product.unit}
-              {product.locationLabel ? <> · Location: <strong className="text-slate-900">{product.locationLabel}</strong></> : null}
+            <p className="text-sm text-ink/60">
+              Current quantity: <strong className="text-ink">{formatInt(current)}</strong> {product.unit}
+              {product.locationLabel ? <> · Location: <strong className="text-ink">{product.locationLabel}</strong></> : null}
             </p>
             <Field
               id={qId}
@@ -185,7 +185,7 @@ export function StockMovementForm({
                     aria-pressed={reason === r}
                     className={cx(
                       "min-h-9 rounded-full px-3 text-xs font-medium ring-1 ring-inset",
-                      reason === r ? "bg-brand-600 text-white ring-brand-600" : "bg-white text-slate-700 ring-slate-300 hover:bg-slate-50",
+                      reason === r ? "bg-brand-600 text-white ring-brand-600" : "bg-white text-ink/80 ring-ink/20 hover:bg-paper",
                     )}
                   >
                     {r}
@@ -231,31 +231,31 @@ export function StockMovementForm({
           </>
         ) : (
           <div className="space-y-4">
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm">
-              <p className="font-semibold text-slate-900">Confirm {isAdjust ? "adjustment" : "stock out"}</p>
+            <div className="rounded-lg border border-ink/10 bg-paper p-4 text-sm">
+              <p className="font-semibold text-ink">Confirm {isAdjust ? "adjustment" : "stock out"}</p>
               <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
-                <dt className="text-slate-600">Product</dt>
+                <dt className="text-ink/60">Product</dt>
                 <dd className="font-medium">
-                  {product.name} <span className="text-slate-500">({product.sku})</span>
+                  {product.name} <span className="text-ink/60">({product.sku})</span>
                 </dd>
-                <dt className="text-slate-600">Current</dt>
+                <dt className="text-ink/60">Current</dt>
                 <dd className="tabular-nums">{formatInt(current)} {product.unit}</dd>
-                <dt className="text-slate-600">Change</dt>
+                <dt className="text-ink/60">Change</dt>
                 <dd className={cx("font-semibold tabular-nums", delta > 0 ? "text-emerald-700" : "text-red-700")}>
                   {formatDelta(delta)} {product.unit}
                 </dd>
-                <dt className="text-slate-600">New quantity</dt>
+                <dt className="text-ink/60">New quantity</dt>
                 <dd className="font-semibold tabular-nums">{formatInt(after)} {product.unit}</dd>
-                <dt className="text-slate-600">Reason</dt>
+                <dt className="text-ink/60">Reason</dt>
                 <dd>{reason}</dd>
                 {reference && (
                   <>
-                    <dt className="text-slate-600">Reference</dt>
+                    <dt className="text-ink/60">Reference</dt>
                     <dd>{reference}</dd>
                   </>
                 )}
               </dl>
-              <p className="mt-3 text-xs text-slate-500">
+              <p className="mt-3 text-xs text-ink/60">
                 The server re-checks the live quantity. If stock changed in the meantime, nothing is saved and you will see the latest number.
               </p>
             </div>

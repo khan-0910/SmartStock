@@ -13,7 +13,7 @@ export default async function SettingsPage() {
   const ctx = await getContext();
   return (
     <>
-      <PageHeader title="Settings" />
+      <PageHeader title="Settings" kicker="Account" />
       <div className="grid max-w-2xl gap-6">
         <Card>
           <h2 className="mb-4 font-semibold">Workspace</h2>

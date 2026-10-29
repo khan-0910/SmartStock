@@ -21,7 +21,7 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
 
   return (
     <>
-      <PageHeader title="Add product" description="Opening stock is recorded afterwards as a stock-in movement, so it appears in history." />
+      <PageHeader title="Add product" kicker="Catalog" description="Opening stock is recorded afterwards as a stock-in movement, so it appears in history." />
       {!isOwner(ctx) ? (
         <Alert tone="warning">Only workspace owners can add products.</Alert>
       ) : (

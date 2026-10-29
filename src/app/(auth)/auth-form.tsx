@@ -81,7 +81,7 @@ export function AuthForm({
       <SubmitButton className="w-full" pendingLabel={isLogin ? "Signing in…" : "Creating account…"}>
         {isLogin ? "Sign in" : "Create account"}
       </SubmitButton>
-      <p className="text-center text-sm text-slate-600">
+      <p className="text-center text-sm text-ink/60">
         {isLogin ? "New to SmartStock? " : "Already have an account? "}
         <Link href={isLogin ? "/signup" : "/login"} className="font-semibold text-brand-700 hover:underline">
           {isLogin ? "Create an account" : "Sign in"}

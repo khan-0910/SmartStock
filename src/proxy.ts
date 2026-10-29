@@ -82,8 +82,8 @@ export async function proxy(request: NextRequest) {
     return redirectWithCookies(login, response);
   }
 
-  // Signed-in visitors skip the marketing page and auth forms.
-  if (user && (path === "/" || path === "/login" || path === "/signup")) {
+  // Signed-in visitors skip the auth forms (the homepage stays reachable).
+  if (user && (path === "/login" || path === "/signup")) {
     const home = request.nextUrl.clone();
     home.pathname = "/dashboard";
     home.search = "";

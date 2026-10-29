@@ -11,12 +11,17 @@ import type { Role } from "@/lib/types";
  */
 export const getContext = cache(async () => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Both calls carry the same session token, so run them together (one
+  // network round trip instead of two). The workspace result is only used
+  // once getUser has verified that token.
+  const [
+    {
+      data: { user },
+    },
+    { data, error },
+  ] = await Promise.all([supabase.auth.getUser(), supabase.rpc("ensure_workspace").single()]);
   if (!user) redirect("/login");
 
-  const { data, error } = await supabase.rpc("ensure_workspace").single();
   if (error || !data) {
     console.error("ensure_workspace failed", error?.code, error?.message);
     throw new Error("Could not load your workspace. Check that the database migrations have been applied.");

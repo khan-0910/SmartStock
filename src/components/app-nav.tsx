@@ -80,7 +80,7 @@ export function AppNav({ workspaceName, email, signOutAction }: { workspaceName:
   );
 
   const brand = (
-    <Link href="/dashboard" className="flex items-center gap-2 px-3">
+    <Link href="/" title="SmartStock homepage" className="flex items-center gap-2 px-3">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/icon.svg" alt="" width={28} height={28} />
       <span className="min-w-0">

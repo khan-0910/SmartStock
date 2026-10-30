@@ -65,29 +65,61 @@ export async function startCameraScan(video: HTMLVideoElement, onDecode: (text: 
   }
 
   let stopped = false;
-  let controls: { stop: () => void } | null = null;
+  let timer: ReturnType<typeof setTimeout> | undefined;
   const stop = () => {
     if (stopped) return;
     stopped = true;
-    controls?.stop();
+    clearTimeout(timer);
     for (const track of stream.getTracks()) track.stop();
     video.srcObject = null;
   };
 
   try {
-    const hints = new Map<DecodeHintType, unknown>([
-      [DecodeHintType.POSSIBLE_FORMATS, FORMATS],
-      [DecodeHintType.TRY_HARDER, true],
-    ]);
-    const reader = new BrowserMultiFormatOneDReader(hints, { delayBetweenScanAttempts: 150 });
-    controls = await reader.decodeFromStream(stream, video, (result) => {
-      if (result && !stopped) onDecode(result.getText());
-    });
-    if (stopped) controls.stop();
-  } catch (err) {
+    video.muted = true;
+    video.playsInline = true;
+    video.srcObject = stream;
+    await video.play();
+  } catch {
     stop();
-    throw err instanceof CameraError ? err : new CameraError("failed", "The barcode decoder could not start.");
+    throw new CameraError("failed", "The camera preview could not start.");
   }
+
+  // Our own loop instead of the library's decodeFromStream: the library ends
+  // its loop (and unplugs the video) on the first unexpected decoder error,
+  // which 1D readers throw on blurry frames. Here every failed frame just
+  // means "no barcode yet, try the next one".
+  const hints = new Map<DecodeHintType, unknown>([
+    [DecodeHintType.POSSIBLE_FORMATS, FORMATS],
+    [DecodeHintType.TRY_HARDER, true],
+  ]);
+  const reader = new BrowserMultiFormatOneDReader(hints);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) {
+    stop();
+    throw new CameraError("failed", "The barcode decoder could not start.");
+  }
+
+  const tick = () => {
+    if (stopped) return;
+    const w = video.videoWidth;
+    const h = video.videoHeight;
+    if (w && h) {
+      // Decode a downscaled frame: plenty for 1D barcodes and much faster.
+      const scale = Math.min(1, 960 / w);
+      canvas.width = Math.round(w * scale);
+      canvas.height = Math.round(h * scale);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      try {
+        const text = reader.decodeFromCanvas(canvas).getText();
+        if (!stopped) onDecode(text);
+      } catch {
+        // No readable barcode in this frame.
+      }
+    }
+    timer = setTimeout(tick, 120);
+  };
+  tick();
 
   return { stop };
 }

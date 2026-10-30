@@ -293,6 +293,19 @@ describe("currency", () => {
   });
 });
 
+describe("price entry currency", () => {
+  it("records the entry currency and rate, and rejects bad combinations", async () => {
+    const p = await newProduct(ALICE, aliceWs, "FX-1", { cost_price: "13.13", price_currency: "INR", price_fx_rate: "95.27" });
+    const [row] = await rows<{ cost_price: string; price_currency: string; price_fx_rate: string }>(
+      "select cost_price::text, price_currency, price_fx_rate::text from public.products where id = $1",
+      [p],
+    );
+    expect(row).toEqual({ cost_price: "13.13", price_currency: "INR", price_fx_rate: "95.27000000" });
+    await expect(newProduct(ALICE, aliceWs, "FX-2", { price_currency: "XYZ" })).rejects.toThrow();
+    await expect(newProduct(ALICE, aliceWs, "FX-3", { price_currency: "USD", price_fx_rate: "2" })).rejects.toThrow(/products_usd_rate_check/);
+  });
+});
+
 describe("unload demo data", () => {
   it("removes demo products, their history and unused demo locations, and nothing else", async () => {
     const ERIN = "00000000-0000-4000-8000-00000000000e";

@@ -6,7 +6,9 @@ import { signOut } from "../(auth)/actions";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const ctx = await getContext();
   return (
-    <div className="app-theme min-h-dvh bg-canvas text-ink">
+    <div className="app-theme isolate min-h-dvh bg-canvas text-ink">
+      {/* Fixed colour splash; -z-10 inside this isolated stack = behind content, above the page colour. */}
+      <div aria-hidden className="app-splash pointer-events-none fixed inset-0 -z-10" />
       <SmoothScroll />
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
         Skip to content

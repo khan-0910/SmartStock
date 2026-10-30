@@ -7,6 +7,7 @@ import { Alert, Card, EmptyState, LinkButton, PageHeader } from "@/components/ui
 import { getContext, isOwner } from "@/lib/auth";
 import { friendlyDbError } from "@/lib/errors";
 import { formatInt } from "@/lib/format";
+import { moneyDisplay } from "@/lib/fx";
 import { MOVEMENT_SELECT, PRODUCT_SELECT } from "@/lib/queries";
 import type { Movement, ProductWithLocation } from "@/lib/types";
 import { loadDemoData, unloadDemoData } from "../products/actions";
@@ -51,6 +52,7 @@ const QUICK: { href: string; title: string; caption: string; icon: string; tone:
 
 export default async function DashboardPage() {
   const ctx = await getContext();
+  const money = await moneyDisplay(ctx.workspace.currency);
   const { supabase, workspace } = ctx;
 
   const [metricsRes, lowRes, movesRes, locCountRes, demoRes] = await Promise.all([
@@ -168,9 +170,9 @@ export default async function DashboardPage() {
         <Metric label="Units on hand" value={Number(m.units_on_hand)} note="Sum across all units (each, box, roll…)." tone="lavender" icon={ICONS.stack} />
         <Metric
           label="Inventory value (at cost)"
-          value={Number(m.inventory_value)}
+          value={money.convert(m.inventory_value) ?? 0}
           money
-          currency={workspace.currency}
+          currency={money.currency}
           tone="apricot"
           icon={ICONS.coin}
           note={missingCost > 0 ? `Excludes ${missingCost} product${missingCost === 1 ? "" : "s"} with no cost price.` : "Quantity × cost price, active products."}

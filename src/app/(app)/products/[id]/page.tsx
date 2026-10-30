@@ -6,7 +6,8 @@ import { MovementTable } from "@/components/movement-table";
 import { StockMovementForm } from "@/components/stock-movement-form";
 import { Alert, Card, LinkButton, LowStockBadge, PageHeader, StatusBadge } from "@/components/ui";
 import { getContext, isOwner } from "@/lib/auth";
-import { formatInt, formatMoney } from "@/lib/format";
+import { formatInt } from "@/lib/format";
+import { moneyDisplay } from "@/lib/fx";
 import { MOVEMENT_SELECT, PRODUCT_SELECT } from "@/lib/queries";
 import type { Movement, MovementType, ProductWithLocation } from "@/lib/types";
 import { isUuid } from "@/lib/validation";
@@ -21,6 +22,7 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
   const sp = await searchParams;
   if (!isUuid(id)) notFound();
   const ctx = await getContext();
+  const money = await moneyDisplay(ctx.workspace.currency);
 
   const [productRes, movesRes] = await Promise.all([
     ctx.supabase.from("products").select(PRODUCT_SELECT).eq("id", id).maybeSingle(),
@@ -93,10 +95,17 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
               <dt className="text-ink/60">Barcode</dt>
               <dd className="font-mono text-xs leading-5">{product.barcode ?? <span className="font-sans text-ink/60">None</span>}</dd>
               <dt className="text-ink/60">Cost price</dt>
-              <dd>{formatMoney(product.cost_price, ctx.workspace.currency)}</dd>
+              <dd>{money.format(product.cost_price)}</dd>
               <dt className="text-ink/60">Selling price</dt>
-              <dd>{formatMoney(product.selling_price, ctx.workspace.currency)}</dd>
+              <dd>{money.format(product.selling_price)}</dd>
             </dl>
+            <p className="mt-3 text-xs text-ink/50">
+              Prices are stored in USD{money.currency !== "USD" ? ` and shown in ${money.currency} at today's reference rate` : ""}.
+              {product.price_currency && product.price_currency !== "USD" && (
+                <> Entered in {product.price_currency} at 1 USD = {Number(product.price_fx_rate).toLocaleString("en-US", { maximumFractionDigits: 4 })} {product.price_currency}.</>
+              )}
+              {!money.converted && " Exchange rates are unavailable right now, so amounts are shown in USD."}
+            </p>
             {product.description && <p className="mt-4 whitespace-pre-line border-t border-ink/10 pt-4 text-sm text-ink/80">{product.description}</p>}
           </Card>
 

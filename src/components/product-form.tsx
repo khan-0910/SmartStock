@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { SubmitButton } from "./submit-button";
 import { Alert, describedBy, Field, inputClass, LinkButton } from "./ui";
+import { CURRENCIES } from "@/lib/format";
 import type { ActionState, Location, Product } from "@/lib/types";
 
 type Values = Record<string, string>;
 
-function initialValues(product?: Product, barcode?: string): Values {
+// Stored prices are USD, so an existing product is edited in USD; a new one
+// starts in the workspace currency (converted to USD when saved).
+function initialValues(product?: Product, barcode?: string, currency = "USD"): Values {
   return {
     name: product?.name ?? "",
     sku: product?.sku ?? "",
@@ -19,6 +22,7 @@ function initialValues(product?: Product, barcode?: string): Values {
     selling_price: product?.selling_price != null ? String(product.selling_price) : "",
     reorder_level: String(product?.reorder_level ?? 0),
     primary_location_id: product?.primary_location_id ?? "",
+    price_currency: product ? "USD" : currency,
   };
 }
 
@@ -40,9 +44,11 @@ export function ProductForm({
   const [state, formAction] = useActionState(action, { status: "idle" });
   const errors = state.status === "error" ? (state.fieldErrors ?? {}) : {};
   // After a failed submit, show what the user typed rather than the originals.
-  const values = state.status === "error" && state.values ? state.values : initialValues(product, prefillBarcode);
+  const values = state.status === "error" && state.values ? state.values : initialValues(product, prefillBarcode, currency);
   // key forces inputs to pick up new defaultValues after each failed submit.
   const formKey = state.status === "error" ? JSON.stringify(state.values) : "initial";
+  // Controlled so the price labels follow the chosen currency.
+  const [priceCurrency, setPriceCurrency] = useState(values.price_currency || "USD");
 
   const text = (name: keyof Values & string, label: string, opts: { required?: boolean; hint?: string; inputMode?: "decimal" | "numeric"; maxLength?: number; autoComplete?: string } = {}) => (
     <Field id={name} label={label} required={opts.required} hint={opts.hint} error={errors[name]}>
@@ -143,8 +149,36 @@ export function ProductForm({
 
       <fieldset className="grid gap-4 sm:grid-cols-2">
         <legend className="mb-2 text-sm font-semibold text-ink">Pricing</legend>
-        {text("cost_price", `Cost price (${currency})`, { inputMode: "decimal", hint: "Used for inventory value. Leave blank if unknown." })}
-        {text("selling_price", `Selling price (${currency})`, { inputMode: "decimal" })}
+        <div className="sm:col-span-2">
+          <Field
+            id="price_currency"
+            label="Prices entered in"
+            required
+            error={errors.price_currency}
+            hint={
+              priceCurrency === "USD"
+                ? "Prices are stored in US dollars."
+                : `Converted to US dollars with today's reference rate when you save. The rate is recorded with the product.`
+            }
+          >
+            <select
+              id="price_currency"
+              name="price_currency"
+              value={priceCurrency}
+              onChange={(e) => setPriceCurrency(e.target.value)}
+              className={inputClass}
+              {...describedBy("price_currency", { hint: true, error: errors.price_currency })}
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.code} · {c.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+        {text("cost_price", `Cost price (${priceCurrency})`, { inputMode: "decimal", hint: "Used for inventory value. Leave blank if unknown." })}
+        {text("selling_price", `Selling price (${priceCurrency})`, { inputMode: "decimal" })}
       </fieldset>
 
       <div className="flex flex-wrap gap-2 border-t border-ink/10 pt-4">

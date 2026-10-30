@@ -5,16 +5,16 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { cx } from "./ui";
 
-type Item = { href: string; label: string; icon: string };
+type Item = { href: string; label: string; icon: string; chip?: string };
 
 const SECTIONS: { title: string; items: Item[] }[] = [
   {
     title: "Inventory",
     items: [
-      { href: "/dashboard", label: "Overview", icon: "M4 13h6V4H4zM14 20h6v-9h-6zM14 4v3h6V4zM4 20h6v-3H4z" },
-      { href: "/products", label: "Products", icon: "M4 7.5L12 3l8 4.5v9L12 21l-8-4.5zM4 7.5l8 4.5 8-4.5M12 12v9" },
-      { href: "/movements", label: "Movements", icon: "M7 4v16M3.5 7.5L7 4l3.5 3.5M17 20V4M13.5 16.5L17 20l3.5-3.5" },
-      { href: "/locations", label: "Locations", icon: "M12 21s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12zM12 11.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" },
+      { href: "/dashboard", label: "Overview", chip: "bg-lilac text-(--lav-ink)", icon: "M4 13h6V4H4zM14 20h6v-9h-6zM14 4v3h6V4zM4 20h6v-3H4z" },
+      { href: "/products", label: "Products", chip: "bg-lime text-(--sage-ink)", icon: "M4 7.5L12 3l8 4.5v9L12 21l-8-4.5zM4 7.5l8 4.5 8-4.5M12 12v9" },
+      { href: "/movements", label: "Movements", chip: "bg-sun text-(--peach-ink)", icon: "M7 4v16M3.5 7.5L7 4l3.5 3.5M17 20V4M13.5 16.5L17 20l3.5-3.5" },
+      { href: "/locations", label: "Locations", chip: "bg-coral/70 text-(--peach-ink)", icon: "M12 21s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12zM12 11.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" },
     ],
   },
   {
@@ -23,6 +23,7 @@ const SECTIONS: { title: string; items: Item[] }[] = [
       {
         href: "/settings",
         label: "Settings",
+        chip: "bg-lilac text-(--lav-ink)",
         icon: "M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z",
       },
     ],
@@ -84,12 +85,21 @@ function NavBody({
                       onClick={onNavigate}
                       aria-current={active ? "page" : undefined}
                       className={cx(
-                        "relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors",
+                        "group relative flex h-10 items-center gap-3 rounded-xl px-2 text-sm font-semibold transition-colors",
                         active ? "bg-white text-ink shadow-[0_1px_2px_rgba(45,42,62,0.06)]" : "text-ink/60 hover:bg-white/60 hover:text-ink",
                       )}
                     >
-                      {active && <span aria-hidden className="absolute inset-y-2 left-0 w-[3px] rounded-full bg-teal" />}
-                      <Icon d={item.icon} className={active ? "text-(--sage-ink)" : undefined} />
+                      {active && <span aria-hidden className="absolute inset-y-2.5 -left-4 w-1 rounded-r-full bg-brand-600" />}
+                      <span
+                        aria-hidden
+                        className={cx(
+                          "inline-flex size-7 items-center justify-center rounded-lg transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110",
+                          item.chip,
+                          !active && "opacity-80 saturate-75",
+                        )}
+                      >
+                        <Icon d={item.icon} className="size-4" />
+                      </span>
                       {item.label}
                     </Link>
                   </li>

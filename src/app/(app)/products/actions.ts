@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { getContext, isOwner } from "@/lib/auth";
 import { dbErrorCode, friendlyDbError } from "@/lib/errors";
 import { PRODUCT_SELECT } from "@/lib/queries";
+import { getUsdRates } from "@/lib/fx";
+import { toUsd } from "@/lib/fx-math";
 import { rateLimit } from "@/lib/rate-limit";
 import type { ActionState, MovementType, ProductWithLocation } from "@/lib/types";
 import { fieldErrors, formFields, isUuid, movementSchema, normalizeBarcode, productSchema } from "@/lib/validation";
@@ -19,6 +21,7 @@ const PRODUCT_FIELDS = [
   "selling_price",
   "reorder_level",
   "primary_location_id",
+  "price_currency",
 ] as const;
 
 function revalidateInventory(productId?: string) {
@@ -39,6 +42,22 @@ export async function saveProduct(productId: string | null, _prev: ActionState, 
   }
   const input = parsed.data;
 
+  // Prices are stored in USD. Convert what was typed using today's reference rate
+  // and keep the currency + rate so the conversion can be traced later.
+  let priceFxRate = 1;
+  if (input.price_currency !== "USD" && (input.cost_price || input.selling_price)) {
+    const rate = (await getUsdRates())?.rates[input.price_currency];
+    if (!rate) {
+      const message = "Exchange rates are unavailable right now, so these prices cannot be converted. Enter them in USD or try again shortly.";
+      return { status: "error", message, fieldErrors: { price_currency: message }, values: raw };
+    }
+    if (input.cost_price) input.cost_price = toUsd(input.cost_price, rate);
+    if (input.selling_price) input.selling_price = toUsd(input.selling_price, rate);
+    priceFxRate = rate;
+  } else {
+    input.price_currency = "USD";
+  }
+
   // Location must be visible to this user (RLS = same workspace). Active is
   // enforced by a database trigger when the location changes.
   if (input.primary_location_id) {
@@ -48,8 +67,8 @@ export async function saveProduct(productId: string | null, _prev: ActionState, 
 
   const query =
     productId === null
-      ? ctx.supabase.from("products").insert({ ...input, workspace_id: ctx.workspace.id }).select("id").single()
-      : ctx.supabase.from("products").update(input).eq("id", productId).select("id").single();
+      ? ctx.supabase.from("products").insert({ ...input, price_fx_rate: priceFxRate, workspace_id: ctx.workspace.id }).select("id").single()
+      : ctx.supabase.from("products").update({ ...input, price_fx_rate: priceFxRate }).eq("id", productId).select("id").single();
   const { data, error } = await query;
 
   if (error || !data) {

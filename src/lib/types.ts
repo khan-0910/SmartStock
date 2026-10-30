@@ -26,6 +26,9 @@ export type Product = {
   primary_location_id: string | null;
   is_active: boolean;
   is_low_stock: boolean;
+  /** Currency the prices were typed in, and units of it per 1 USD at the time. Prices themselves are USD. */
+  price_currency: string;
+  price_fx_rate: number | string;
   created_at: string;
   updated_at: string;
 };

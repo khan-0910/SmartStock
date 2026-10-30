@@ -136,9 +136,17 @@ export function Scanner() {
             }}
             className="space-y-3"
           >
-            <label htmlFor="barcode" className="block text-sm font-medium text-ink/80">
-              Barcode
-            </label>
+            <div className="flex items-center gap-3">
+              <span aria-hidden className="inline-flex size-10 items-center justify-center rounded-2xl bg-lime text-(--sage-ink)">
+                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round"><path d="M4 6h16v12H4zM8 10h.01M12 10h.01M16 10h.01M8 14h8" /></svg>
+              </span>
+              <div>
+                <label htmlFor="barcode" className="block font-display text-lg font-semibold text-ink">
+                  Type or scan a code
+                </label>
+                <p className="text-xs text-ink/55">Keyboard, paste or USB/Bluetooth scanner</p>
+              </div>
+            </div>
             <div className="flex gap-2">
               <input
                 ref={inputRef}
@@ -152,7 +160,7 @@ export function Scanner() {
                 className={`${inputClass} font-mono`}
                 {...describedBy("barcode", { hint: true })}
               />
-              <Button type="submit" disabled={pending}>
+              <Button type="submit" disabled={pending} className="shrink-0 whitespace-nowrap">
                 {pending ? "Looking…" : "Look up"}
               </Button>
             </div>
@@ -164,16 +172,21 @@ export function Scanner() {
 
         <Card>
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="font-semibold">Camera</h2>
-              <p className="text-xs text-ink/60">Reads {SUPPORTED_FORMATS.join(", ")}.</p>
+            <div className="flex items-center gap-3">
+              <span aria-hidden className="inline-flex size-10 shrink-0 items-center justify-center rounded-2xl bg-coral/70 text-(--peach-ink)">
+                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 100-8 4 4 0 000 8z" /></svg>
+              </span>
+              <div>
+                <h2 className="font-display text-lg font-semibold">Camera</h2>
+                <p className="text-xs text-ink/55">Reads {SUPPORTED_FORMATS.join(", ")}.</p>
+              </div>
             </div>
             {camera === "off" ? (
-              <Button type="button" variant="secondary" onClick={startCamera}>
+              <Button type="button" variant="secondary" onClick={startCamera} className="shrink-0 whitespace-nowrap">
                 Scan with camera
               </Button>
             ) : (
-              <Button type="button" variant="danger" onClick={stopCamera}>
+              <Button type="button" variant="danger" onClick={stopCamera} className="shrink-0 whitespace-nowrap">
                 Stop camera
               </Button>
             )}
@@ -209,8 +222,27 @@ export function Scanner() {
           {announce}
         </p>
         {!result && (
-          <div className="rounded-xl border border-dashed border-ink/10 bg-white p-8 text-center text-sm text-ink/60">
-            Scan or enter a barcode to find a product. Scanning only selects the product; stock changes need your confirmation.
+          <div className="relative overflow-hidden rounded-3xl border border-white/80 bg-white/70 p-6 shadow-[0_10px_30px_-18px_rgba(95,79,168,0.45)] sm:p-8">
+            <div aria-hidden className="absolute -top-10 -right-10 size-40 rounded-full bg-lilac/70" />
+            <div aria-hidden className="absolute -bottom-12 -left-8 size-32 rounded-full bg-sun/60" />
+            <div className="relative">
+              <h2 className="font-display text-xl font-semibold">How scanning works</h2>
+              <ol className="mt-5 space-y-3">
+                {[
+                  { n: "1", t: "Scan or type the code", d: "We find the exact product in your workspace.", c: "bg-lime text-(--sage-ink)" },
+                  { n: "2", t: "Pick stock in, out or adjust", d: "You see the current quantity and the result first.", c: "bg-lilac text-(--lav-ink)" },
+                  { n: "3", t: "Confirm", d: "Balance and history are saved together. Nothing changes until you confirm.", c: "bg-coral/70 text-(--peach-ink)" },
+                ].map((step) => (
+                  <li key={step.n} className="flex gap-3 rounded-2xl bg-white/80 p-3">
+                    <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-xl font-display font-bold ${step.c}`}>{step.n}</span>
+                    <div>
+                      <p className="text-sm font-semibold">{step.t}</p>
+                      <p className="text-xs text-ink/60">{step.d}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
         )}
         {result?.status === "error" && (

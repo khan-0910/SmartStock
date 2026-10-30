@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CURRENCIES } from "./format";
 
 // Shared input rules. The database enforces the same limits; these give
 // friendly, field-level messages first.
@@ -80,6 +81,12 @@ export const productSchema = z.object({
     .trim()
     .transform((v) => (v === "" ? null : v))
     .pipe(UUID.nullable()),
+  /** Currency the prices were typed in; they are converted to USD before saving. */
+  price_currency: z
+    .string()
+    .optional()
+    .transform((v) => v || "USD")
+    .pipe(z.enum(CURRENCIES.map((c) => c.code) as [string, ...string[]], { message: "Choose a supported currency." })),
 });
 export type ProductInput = z.infer<typeof productSchema>;
 

@@ -65,6 +65,20 @@
   --sage-ink: #2f6b52;
   --peach-ink: #a24a2c;
   --lav-ink: #5f4fa8;
+
+  --font-display: var(--font-fun), var(--font-friendly), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-friendly), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Soft colour splashes behind app pages (static gradients: no blur filters, no animation cost). */
+.app-splash {
+  background:
+    radial-gradient(40rem 28rem at 105% -5%, rgb(246 191 168 / 0.8), transparent 65%),
+    radial-gradient(32rem 24rem at 35% -12%, rgb(205 194 245 / 0.95), transparent 70%),
+    radial-gradient(36rem 32rem at -5% 60%, rgb(176 222 196 / 0.75), transparent 70%),
+    radial-gradient(30rem 26rem at 100% 95%, rgb(248 210 160 / 0.75), transparent 70%),
+    radial-gradient(circle at 1px 1px, rgb(45 42 62 / 0.07) 1px, transparent 0) 0 0 / 22px 22px;
 }
 
 body {

@@ -26,7 +26,7 @@ export function WorkspaceForm({ name, currency }: { name: string; currency: stri
         label="Currency"
         required
         error={currencyError}
-        hint="Used to display prices and inventory value. Changing it does not convert amounts you have already entered."
+        hint="Prices are stored in US dollars and shown in this currency at the latest daily reference rate. New products default to entering prices in this currency."
       >
         <select id="ws-currency" name="currency" defaultValue={currencyValue} className={inputClass} {...describedBy("ws-currency", { hint: true, error: currencyError })}>
           {CURRENCIES.map((c) => (

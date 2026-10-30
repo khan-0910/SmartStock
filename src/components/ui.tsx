@@ -10,7 +10,7 @@ export function cx(...classes: (string | false | null | undefined)[]) {
 }
 
 const BUTTON = {
-  primary: "bg-ink text-paper hover:bg-brand-600 disabled:bg-ink/50",
+  primary: "bg-brand-700 text-white shadow-[0_6px_16px_-8px_var(--color-brand-700)] hover:bg-brand-800 disabled:bg-brand-700/50",
   secondary: "bg-white text-ink ring-1 ring-inset ring-ink/20 hover:bg-paper-deep disabled:text-ink/60",
   danger: "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-600/60",
   ghost: "text-ink/80 hover:bg-paper",
@@ -35,7 +35,7 @@ export function LinkButton({ variant = "primary", className, ...props }: Compone
 }
 
 export const inputClass =
-  "block w-full min-h-10 rounded-lg border border-ink/15 bg-white px-3.5 py-2 text-sm text-ink placeholder:text-ink/35 transition-[border-color,box-shadow] duration-200 hover:border-ink/30 focus:border-brand-600 focus:shadow-[0_0_0_4px_rgba(91,61,245,0.15)] focus:outline-none aria-[invalid=true]:border-coral";
+  "block w-full min-h-10 rounded-xl border border-brand-600/20 bg-white/90 px-3.5 py-2 text-sm text-ink placeholder:text-ink/35 transition-[border-color,box-shadow] duration-200 hover:border-ink/30 focus:border-brand-600 focus:shadow-[0_0_0_4px_rgba(91,61,245,0.15)] focus:outline-none aria-[invalid=true]:border-coral";
 
 export function Field({
   id,
@@ -162,7 +162,11 @@ export function PageHeader({
 }
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <section className={cx("rounded-2xl border border-ink/[0.08] bg-white p-4 shadow-[0_1px_2px_rgba(19,17,28,0.04)] sm:p-6", className)}>{children}</section>;
+  return (
+    <section className={cx("rounded-3xl border border-white/80 bg-white/80 p-4 shadow-[0_10px_30px_-18px_rgba(95,79,168,0.45)] sm:p-6", className)}>
+      {children}
+    </section>
+  );
 }
 
 export function EmptyState({ title, children, actions }: { title: string; children?: ReactNode; actions?: ReactNode }) {

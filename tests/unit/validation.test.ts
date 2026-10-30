@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { friendlyDbError } from "@/lib/errors";
 import { formatMoney } from "@/lib/format";
+import { fromUsd, toUsd } from "@/lib/fx-math";
 import { locationSchema, movementSchema, normalizeBarcode, productSchema, safeSearchTerm } from "@/lib/validation";
 
 const baseProduct = {
@@ -119,6 +120,19 @@ describe("formatMoney", () => {
     expect(formatMoney(10, "INR")).toBe("₹10.00");
     expect(formatMoney(10, "SGD")).toMatch(/^SGD\s10\.00$/); // Intl uses a non-breaking space
     expect(formatMoney(null, "USD")).toBe("—");
+  });
+});
+
+describe("currency conversion", () => {
+  it("converts entered prices to USD cents", () => {
+    expect(toUsd("1250.50", 95.27)).toBe("13.13");
+    expect(toUsd("1500", 158.06)).toBe("9.49");
+    expect(toUsd("10", 1)).toBe("10.00");
+    expect(toUsd("0", 0.9)).toBe("0.00");
+    expect(() => toUsd("10", 0)).toThrow();
+  });
+  it("converts stored USD back for display", () => {
+    expect(fromUsd("13.13", 95.27)).toBeCloseTo(1250.8951, 4);
   });
 });
 

@@ -46,7 +46,7 @@ export function ActionButton({
         <dialog
           ref={dialogRef}
           aria-labelledby="confirm-title"
-          className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-[1.75rem] border-2 border-ink bg-paper p-0 text-ink shadow-[8px_8px_0_0_var(--color-ink)] backdrop:bg-ink/50 open:animate-[pop_0.45s_var(--ease-out-expo)_both]"
+          className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-2xl border border-ink/10 bg-white p-0 text-ink shadow-2xl backdrop:bg-ink/40 open:animate-[rise_0.3s_var(--ease-out-expo)_both]"
         >
           <div className="space-y-3 p-5">
             <h2 id="confirm-title" className="font-display text-xl font-bold">

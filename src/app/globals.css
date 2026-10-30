@@ -15,6 +15,8 @@
   --color-ink-soft: #2a2638;
   --color-paper: #fbf6ec;
   --color-paper-deep: #f3ead8;
+  /* App background: a step darker than paper so white cards read as surfaces. */
+  --color-canvas: #f1ece2;
 
   --color-brand-50: #f2efff;
   --color-brand-100: #e3dcff;
@@ -140,8 +142,8 @@ a:focus-visible .roll > span {
     border-color 0.2s;
 }
 .lift:hover {
-  transform: translateY(-3px);
-  box-shadow: 6px 6px 0 0 var(--color-ink);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgba(19, 17, 28, 0.25);
 }
 
 /* Loading skeletons: a moving sheen instead of a blink. */

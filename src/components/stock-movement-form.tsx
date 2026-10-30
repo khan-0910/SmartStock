@@ -109,7 +109,7 @@ export function StockMovementForm({
 
   return (
     <div className="space-y-4">
-      <div role="radiogroup" aria-label="Movement type" className="grid grid-cols-3 gap-1 rounded-full border-2 border-ink/10 bg-paper-deep p-1">
+      <div role="radiogroup" aria-label="Movement type" className="grid grid-cols-3 gap-1 rounded-lg bg-canvas p-1">
         {TYPES.map((t) => (
           <button
             key={t}
@@ -118,8 +118,8 @@ export function StockMovementForm({
             aria-checked={type === t}
             onClick={() => switchType(t)}
             className={cx(
-              "min-h-10 rounded-full px-2 text-sm font-bold transition-colors duration-200",
-              type === t ? "bg-ink text-lime shadow-sm" : "text-ink/60 hover:bg-white/70 hover:text-ink",
+              "min-h-9 rounded-md px-2 text-sm font-semibold transition-colors duration-150",
+              type === t ? "bg-white text-ink shadow-sm" : "text-ink/60 hover:text-ink",
             )}
           >
             {t === "adjustment" ? "Adjust" : MOVEMENT_LABELS[t]}

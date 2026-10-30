@@ -88,29 +88,26 @@ export default async function DashboardPage() {
   return (
     <>
       {/* Hero band */}
-      <section className="relative overflow-hidden rounded-[2rem] bg-ink p-6 text-paper sm:p-8">
-        <div aria-hidden className="absolute -top-16 -right-10 size-56 rounded-full bg-brand-600/40" />
-        <div aria-hidden className="absolute -bottom-20 right-40 size-40 rounded-full bg-lime/25" />
+      <section className="relative overflow-hidden rounded-2xl bg-ink p-6 text-paper sm:p-8">
+        <div aria-hidden className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(28rem_14rem_at_100%_0%,rgba(91,61,245,0.45),transparent_70%)]" />
         <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-bold tracking-wide text-lime uppercase">Dashboard</p>
-            <h1 className="mt-2 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Welcome back to <span className="font-serif font-normal italic text-lime">{workspace.name}</span>
-            </h1>
+            <p className="text-xs font-semibold tracking-[0.08em] text-paper/50 uppercase">Overview</p>
+            <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">{workspace.name}</h1>
             <p className="mt-2 text-sm text-paper/60">Figures reflect the database when this page loaded. Refresh to update.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link href="/scan" className="inline-flex h-11 items-center gap-2 rounded-full bg-lime px-5 text-sm font-bold text-ink transition-transform hover:-translate-y-0.5">
+            <Link href="/scan" className="inline-flex h-10 items-center gap-2 rounded-lg bg-lime px-4 text-sm font-semibold text-ink transition-colors hover:bg-[#e4ff7a]">
               Scan barcode
             </Link>
-            <Link href="/products/new" className="inline-flex h-11 items-center rounded-full border-2 border-paper/30 px-5 text-sm font-bold text-paper transition-colors hover:border-paper hover:bg-paper hover:text-ink">
+            <Link href="/products/new" className="inline-flex h-10 items-center rounded-lg border border-paper/20 px-4 text-sm font-semibold text-paper transition-colors hover:bg-white/10">
               Add product
             </Link>
           </div>
         </div>
       </section>
 
-      <div className="stagger-pop mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="stagger-children mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Metric label="Active products" value={Number(m.active_products)} href="/products" color="bg-lime" />
         <Metric label="Units on hand" value={Number(m.units_on_hand)} note="Sum across all units (each, box, roll…)." color="bg-lilac" />
         <Metric
@@ -125,6 +122,7 @@ export default async function DashboardPage() {
           value={lowCount}
           href="/products?stock=low"
           color={lowCount > 0 ? "bg-coral" : "bg-teal"}
+          alert={lowCount > 0}
           note={lowCount > 0 ? "At or below reorder level. Tap to see them." : "Nothing needs reordering."}
         />
       </div>
@@ -132,7 +130,7 @@ export default async function DashboardPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-1">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold">Needs replenishment</h2>
+            <h2 className="font-display text-base font-semibold">Needs replenishment</h2>
             {lowCount > 0 && (
               <Link href="/products?stock=low" className="text-sm font-semibold text-brand-700 hover:underline">
                 View all
@@ -140,14 +138,14 @@ export default async function DashboardPage() {
             )}
           </div>
           {low.length === 0 ? (
-            <p className="rounded-2xl bg-teal/15 p-4 text-sm text-ink/80">✓ No active products are at or below their reorder level.</p>
+            <p className="rounded-xl bg-teal/10 p-4 text-sm text-ink/80">✓ No active products are at or below their reorder level.</p>
           ) : (
             <ul className="stagger-children space-y-2">
               {low.map((p) => {
                 const pct = p.reorder_level > 0 ? Math.min(100, Math.round((p.quantity_on_hand / p.reorder_level) * 100)) : 0;
                 return (
                   <li key={p.id}>
-                    <Link href={`/products/${p.id}`} className="lift block rounded-2xl border-2 border-ink/10 p-3 hover:border-ink">
+                    <Link href={`/products/${p.id}`} className="block rounded-xl border border-ink/[0.08] p-3 transition-colors hover:border-ink/25 hover:bg-canvas/50">
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
                           <p className="truncate text-sm font-semibold">{p.name}</p>
@@ -173,7 +171,7 @@ export default async function DashboardPage() {
 
         <Card className="lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold">Recent movements</h2>
+            <h2 className="font-display text-base font-semibold">Recent movements</h2>
             <Link href="/movements" className="text-sm font-semibold text-brand-700 hover:underline">
               Full history
             </Link>
@@ -196,6 +194,7 @@ function Metric({
   href,
   color,
   money,
+  alert,
 }: {
   label: string;
   value: number;
@@ -203,24 +202,23 @@ function Metric({
   href?: string;
   color: string;
   money?: boolean;
+  alert?: boolean;
 }) {
   const body = (
     <>
-      <p className="text-sm font-semibold text-ink/70">{label}</p>
-      <p className="mt-2 font-display text-4xl font-extrabold tracking-tight">
+      <div className="flex items-center gap-2">
+        <span aria-hidden className={`size-2 rounded-full ${color}`} />
+        <p className="text-sm font-medium text-ink/60">{label}</p>
+      </div>
+      <p className={`mt-3 font-display text-3xl font-bold tracking-tight ${alert ? "text-[#c2391d]" : "text-ink"}`}>
         <CountUp value={value} format={money ? "money" : "int"} />
       </p>
-      {note && <p className="mt-2 text-xs text-ink/70">{note}</p>}
-      {href && (
-        <span aria-hidden className="absolute top-4 right-4 inline-flex size-8 items-center justify-center rounded-full bg-ink text-sm text-paper transition-transform group-hover:rotate-[-45deg]">
-          →
-        </span>
-      )}
+      {note && <p className="mt-1.5 text-xs text-ink/50">{note}</p>}
     </>
   );
-  const cls = `group relative block rounded-[1.5rem] border-2 border-ink p-5 ${color}`;
+  const cls = "block rounded-2xl border border-ink/[0.08] bg-white p-5 shadow-[0_1px_2px_rgba(19,17,28,0.04)]";
   return href ? (
-    <Link href={href} className={`lift ${cls}`}>
+    <Link href={href} className={`lift ${cls} hover:border-ink/20`}>
       {body}
     </Link>
   ) : (

@@ -26,7 +26,7 @@ export function MovementTable({ movements, currentUserId, showProduct = true }: 
           </thead>
           <tbody className="divide-y divide-ink/10">
             {movements.map((m) => (
-              <tr key={m.id} className="align-top transition-colors duration-200 hover:bg-lilac/25">
+              <tr key={m.id} className="align-top transition-colors duration-200 hover:bg-canvas/60">
                 <td className="whitespace-nowrap py-2 pr-3 text-ink/60">{formatDateTime(m.created_at)}</td>
                 {showProduct && (
                   <td className="py-2 pr-3">

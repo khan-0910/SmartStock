@@ -20,7 +20,7 @@ export type ButtonVariant = keyof typeof BUTTON;
 
 export function buttonClass(variant: ButtonVariant = "primary", extra?: string) {
   return cx(
-    "inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-[background-color,color,transform] duration-200 active:scale-[0.97] disabled:cursor-not-allowed",
+    "inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-[background-color,color,transform] duration-150 active:scale-[0.98] disabled:cursor-not-allowed",
     BUTTON[variant],
     extra,
   );
@@ -35,7 +35,7 @@ export function LinkButton({ variant = "primary", className, ...props }: Compone
 }
 
 export const inputClass =
-  "block w-full min-h-11 rounded-xl border-2 border-ink/15 bg-white px-3.5 py-2 text-sm text-ink placeholder:text-ink/35 transition-[border-color,box-shadow] duration-200 hover:border-ink/30 focus:border-brand-600 focus:shadow-[0_0_0_4px_rgba(91,61,245,0.15)] focus:outline-none aria-[invalid=true]:border-coral";
+  "block w-full min-h-10 rounded-lg border border-ink/15 bg-white px-3.5 py-2 text-sm text-ink placeholder:text-ink/35 transition-[border-color,box-shadow] duration-200 hover:border-ink/30 focus:border-brand-600 focus:shadow-[0_0_0_4px_rgba(91,61,245,0.15)] focus:outline-none aria-[invalid=true]:border-coral";
 
 export function Field({
   id,
@@ -91,15 +91,15 @@ export function Alert({
   role?: "alert" | "status";
 }) {
   const tones = {
-    info: "border-ink bg-lilac text-ink",
-    success: "border-ink bg-lime text-ink",
-    error: "border-ink bg-coral text-ink",
-    warning: "border-ink bg-sun text-ink",
+    info: "border-brand-600/20 bg-brand-50 text-ink",
+    success: "border-teal/40 bg-teal/10 text-ink",
+    error: "border-coral/40 bg-coral/10 text-ink",
+    warning: "border-sun/60 bg-sun/15 text-ink",
   };
   const icons = { info: "ℹ", success: "✓", error: "✕", warning: "!" };
   return (
-    <div role={role} className={cx("flex animate-[pop_0.5s_var(--ease-out-expo)_both] gap-3 rounded-2xl border-2 p-3.5 text-sm shadow-[3px_3px_0_0_var(--color-ink)]", tones[tone])}>
-      <span aria-hidden className="inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-ink text-[11px] font-bold text-paper">
+    <div role={role} className={cx("flex gap-3 rounded-xl border p-3.5 text-sm", tones[tone])}>
+      <span aria-hidden className={cx("inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold", { info: "bg-brand-600 text-white", success: "bg-teal text-ink", error: "bg-coral text-ink", warning: "bg-sun text-ink" }[tone])}>
         {icons[tone]}
       </span>
       <div className="space-y-1">
@@ -114,11 +114,8 @@ export function PageHeader({ title, description, actions, kicker }: { title: str
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        {kicker && <p className="mb-1 text-xs font-bold tracking-[0.14em] text-brand-600 uppercase">{kicker}</p>}
-        <h1 className="font-display text-4xl font-extrabold tracking-[-0.03em] text-ink sm:text-5xl">
-          {title}
-          <span aria-hidden className="text-coral">.</span>
-        </h1>
+        {kicker && <p className="mb-1.5 text-xs font-semibold tracking-[0.08em] text-ink/50 uppercase">{kicker}</p>}
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-[2.1rem]">{title}</h1>
         {description && <p className="mt-2 max-w-2xl text-sm text-ink/60">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -127,18 +124,16 @@ export function PageHeader({ title, description, actions, kicker }: { title: str
 }
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <section className={cx("rounded-[1.75rem] border-2 border-ink/10 bg-white p-4 sm:p-6", className)}>{children}</section>;
+  return <section className={cx("rounded-2xl border border-ink/[0.08] bg-white p-4 shadow-[0_1px_2px_rgba(19,17,28,0.04)] sm:p-6", className)}>{children}</section>;
 }
 
 export function EmptyState({ title, children, actions }: { title: string; children?: ReactNode; actions?: ReactNode }) {
   return (
-    <div className="relative overflow-hidden rounded-[1.75rem] border-2 border-dashed border-ink/25 bg-white px-6 py-14 text-center">
-      <div aria-hidden className="mx-auto mb-5 flex w-fit -space-x-3">
-        <span className="size-12 -rotate-12 rounded-2xl border-2 border-ink bg-lime" />
-        <span className="size-12 rotate-6 rounded-2xl border-2 border-ink bg-coral" />
-        <span className="size-12 -rotate-3 rounded-2xl border-2 border-ink bg-lilac" />
-      </div>
-      <h2 className="font-display text-xl font-bold text-ink">{title}</h2>
+    <div className="rounded-2xl border border-dashed border-ink/20 bg-white px-6 py-14 text-center">
+      <span aria-hidden className="mx-auto mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-lime/40 text-ink">
+        <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round"><path d="M4 7.5L12 3l8 4.5v9L12 21l-8-4.5zM4 7.5l8 4.5 8-4.5M12 12v9" /></svg>
+      </span>
+      <h2 className="font-display text-lg font-semibold text-ink">{title}</h2>
       {children && <div className="mx-auto mt-2 max-w-md text-sm text-ink/60">{children}</div>}
       {actions && <div className="mt-5 flex flex-wrap justify-center gap-2">{actions}</div>}
     </div>
@@ -147,7 +142,7 @@ export function EmptyState({ title, children, actions }: { title: string; childr
 
 export function LowStockBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-sun px-2 py-0.5 text-xs font-semibold text-ink">
+    <span className="inline-flex items-center gap-1 rounded-md bg-sun/30 px-2 py-0.5 text-xs font-semibold text-[#7a5300]">
       <span aria-hidden>▼</span> Low stock
     </span>
   );
@@ -155,9 +150,9 @@ export function LowStockBadge() {
 
 export function StatusBadge({ active, activeLabel = "Active", inactiveLabel = "Archived" }: { active: boolean; activeLabel?: string; inactiveLabel?: string }) {
   return active ? (
-    <span className="inline-flex rounded-full bg-teal/20 px-2.5 py-0.5 text-xs font-semibold text-ink ring-1 ring-teal">{activeLabel}</span>
+    <span className="inline-flex rounded-md bg-teal/15 px-2 py-0.5 text-xs font-semibold text-[#0f6b62]">{activeLabel}</span>
   ) : (
-    <span className="inline-flex rounded-full bg-ink/5 px-2.5 py-0.5 text-xs font-semibold text-ink/70 ring-1 ring-ink/20">{inactiveLabel}</span>
+    <span className="inline-flex rounded-md bg-ink/[0.06] px-2 py-0.5 text-xs font-semibold text-ink/70">{inactiveLabel}</span>
   );
 }
 
@@ -175,11 +170,11 @@ export function DeltaBadge({ delta }: { delta: number }) {
 
 export function MovementTypeBadge({ type }: { type: MovementType }) {
   const styles: Record<MovementType, string> = {
-    stock_in: "bg-lime",
-    stock_out: "bg-coral",
-    adjustment: "bg-lilac",
+    stock_in: "bg-teal/15 text-[#0f6b62]",
+    stock_out: "bg-coral/15 text-[#a3301a]",
+    adjustment: "bg-brand-50 text-brand-700",
   };
-  return <span className={cx("inline-flex rounded-full border border-ink px-2.5 py-0.5 text-xs font-bold text-ink", styles[type])}>{MOVEMENT_LABELS[type]}</span>;
+  return <span className={cx("inline-flex rounded-md px-2 py-0.5 text-xs font-semibold", styles[type])}>{MOVEMENT_LABELS[type]}</span>;
 }
 
 export function Pagination({ page, pageSize, total, href }: { page: number; pageSize: number; total: number; href: (page: number) => string }) {

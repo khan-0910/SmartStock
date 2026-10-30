@@ -137,7 +137,7 @@ function ProductList({ products, back }: { products: ProductWithLocation[]; back
           </thead>
           <tbody className="divide-y divide-ink/10">
             {products.map((p) => (
-              <tr key={p.id} className="transition-colors duration-200 hover:bg-lime/25">
+              <tr key={p.id} className="transition-colors duration-200 hover:bg-canvas/60">
                 <td className="px-4 py-3">
                   <Link href={href(p.id)} className="font-medium text-ink hover:underline">
                     {p.name}

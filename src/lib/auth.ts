@@ -26,12 +26,13 @@ export const getContext = cache(async () => {
     console.error("ensure_workspace failed", error?.code, error?.message);
     throw new Error("Could not load your workspace. Check that the database migrations have been applied.");
   }
-  const ws = data as { workspace_id: string; workspace_name: string; role: Role };
+  const ws = data as { workspace_id: string; workspace_name: string; role: Role; currency: string | null };
 
   return {
     supabase,
     user: { id: user.id, email: user.email ?? "" },
-    workspace: { id: ws.workspace_id, name: ws.workspace_name, role: ws.role },
+    // currency is null only until migration 4 has run.
+    workspace: { id: ws.workspace_id, name: ws.workspace_name, role: ws.role, currency: ws.currency ?? "USD" },
   };
 });
 

@@ -110,16 +110,54 @@ export function Alert({
   );
 }
 
-export function PageHeader({ title, description, actions, kicker }: { title: string; description?: ReactNode; actions?: ReactNode; kicker?: string }) {
+export type HeaderTone = "lavender" | "sage" | "peach";
+
+// The wash ends in a different pastel per section so each area has its own identity.
+const HEADER_WASH: Record<HeaderTone, string> = {
+  lavender: "bg-[linear-gradient(115deg,var(--color-lilac)_0%,var(--color-paper)_60%,var(--color-lilac)_140%)]",
+  sage: "bg-[linear-gradient(115deg,var(--color-lilac)_0%,var(--color-paper)_55%,var(--color-lime)_130%)]",
+  peach: "bg-[linear-gradient(115deg,var(--color-lilac)_0%,var(--color-paper)_55%,var(--color-coral)_130%)]",
+};
+
+/** Section overview banner: title, summary, actions and an optional row of stats. */
+export function PageHeader({
+  title,
+  description,
+  actions,
+  kicker,
+  stats,
+  tone = "lavender",
+}: {
+  title: string;
+  description?: ReactNode;
+  actions?: ReactNode;
+  kicker?: string;
+  stats?: { label: string; value: ReactNode }[];
+  tone?: HeaderTone;
+}) {
   return (
-    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        {kicker && <p className="mb-1.5 text-xs font-semibold tracking-[0.08em] text-ink/50 uppercase">{kicker}</p>}
-        <h1 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-[2.1rem]">{title}</h1>
-        {description && <p className="mt-2 max-w-2xl text-sm text-ink/60">{description}</p>}
+    <section className={cx("relative mb-8 overflow-hidden rounded-3xl border border-ink/[0.06] p-6 sm:p-8", HEADER_WASH[tone])}>
+      <div aria-hidden className="pointer-events-none absolute -top-20 right-20 size-52 rounded-full bg-lime/50 blur-2xl" />
+      <div aria-hidden className="pointer-events-none absolute -right-12 -bottom-24 size-60 rounded-full bg-coral/40 blur-2xl" />
+      <div className="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div>
+          {kicker && <p className="mb-1.5 text-xs font-semibold tracking-[0.08em] text-ink/50 uppercase">{kicker}</p>}
+          <h1 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">{title}</h1>
+          {description && <p className="mt-2 max-w-2xl text-sm text-ink/70">{description}</p>}
+        </div>
+        {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
       </div>
-      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
-    </div>
+      {stats && stats.length > 0 && (
+        <dl className="relative mt-6 flex flex-wrap gap-3">
+          {stats.map((s) => (
+            <div key={s.label} className="rounded-xl bg-white/75 px-4 py-2.5 shadow-[0_1px_2px_rgba(45,42,62,0.06)]">
+              <dt className="text-xs font-medium text-ink/55">{s.label}</dt>
+              <dd className="font-display text-xl font-bold tabular-nums text-ink">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </section>
   );
 }
 

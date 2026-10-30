@@ -173,3 +173,14 @@ export async function loadDemoData(): Promise<ActionState> {
   revalidateInventory();
   return { status: "success", message: "Demo data loaded." };
 }
+
+/** Remove the demo products, their history and unused demo locations. */
+export async function unloadDemoData(): Promise<ActionState> {
+  const ctx = await getContext();
+  if (!isOwner(ctx)) return { status: "error", message: "Only workspace owners can remove demo data." };
+  const { data, error } = await ctx.supabase.rpc("unload_demo_data");
+  if (error) return { status: "error", message: friendlyDbError(error, "unloadDemoData") };
+  revalidateInventory();
+  const n = Number(data ?? 0);
+  return { status: "success", message: n ? `Removed ${n} demo products and their history.` : "No demo data was found." };
+}

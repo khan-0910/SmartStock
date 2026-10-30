@@ -4,7 +4,7 @@ import { MovementTable } from "@/components/movement-table";
 import { Alert, buttonClass, Card, EmptyState, inputClass, PageHeader, Pagination } from "@/components/ui";
 import { getContext } from "@/lib/auth";
 import { friendlyDbError } from "@/lib/errors";
-import { qs } from "@/lib/format";
+import { formatInt, qs } from "@/lib/format";
 import { MOVEMENT_SELECT, PAGE_SIZE } from "@/lib/queries";
 import type { Movement } from "@/lib/types";
 import { isUuid, MOVEMENT_TYPES, pageNumber, safeSearchTerm } from "@/lib/validation";
@@ -14,6 +14,11 @@ export const metadata: Metadata = { title: "Movements" };
 type Search = { q?: string; type?: string; from?: string; to?: string; product?: string; page?: string };
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+// Server-rendered per request, so "now" is the request time.
+function daysAgoIso(days: number) {
+  return new Date(Date.now() - days * 86_400_000).toISOString();
+}
 
 export default async function MovementsPage({ searchParams }: { searchParams: Promise<Search> }) {
   const sp = await searchParams;
@@ -34,7 +39,12 @@ export default async function MovementsPage({ searchParams }: { searchParams: Pr
   if (from) query = query.gte("created_at", `${from}T00:00:00Z`);
   if (to) query = query.lt("created_at", new Date(Date.parse(`${to}T00:00:00Z`) + 86_400_000).toISOString());
   if (q) query = query.or(`name.ilike.*${q}*,sku.ilike.*${q}*`, { referencedTable: "product" });
-  const { data, count, error } = await query.order("created_at", { ascending: false }).range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  const weekAgo = daysAgoIso(7);
+  const [{ data, count, error }, totalRes, weekRes] = await Promise.all([
+    query.order("created_at", { ascending: false }).range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1),
+    ctx.supabase.from("stock_movements").select("id", { count: "exact", head: true }).eq("workspace_id", ctx.workspace.id),
+    ctx.supabase.from("stock_movements").select("id", { count: "exact", head: true }).eq("workspace_id", ctx.workspace.id).gte("created_at", weekAgo),
+  ]);
 
   let productName: string | undefined;
   if (productId) {
@@ -48,7 +58,17 @@ export default async function MovementsPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader title="Movement history" kicker="Ledger" description="Every stock change, newest first. Records cannot be edited or deleted; corrections are new adjustments." />
+      <PageHeader
+        title="Movement history"
+        kicker="Ledger"
+        tone="peach"
+        description="Every stock change, newest first. Records cannot be edited or deleted; corrections are new adjustments."
+        stats={[
+          { label: "All movements", value: formatInt(totalRes.count ?? 0) },
+          { label: "Last 7 days", value: formatInt(weekRes.count ?? 0) },
+          ...(filtered ? [{ label: "Matching filters", value: formatInt(count ?? 0) }] : []),
+        ]}
+      />
 
       <Card className="mb-4">
         <form role="search" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto_auto_auto] lg:items-end">

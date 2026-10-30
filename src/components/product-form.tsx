@@ -28,12 +28,14 @@ export function ProductForm({
   locations,
   prefillBarcode,
   cancelHref,
+  currency = "USD",
 }: {
   action: (prev: ActionState, form: FormData) => Promise<ActionState>;
   product?: Product;
   locations: Pick<Location, "id" | "code" | "name" | "is_active">[];
   prefillBarcode?: string;
   cancelHref: string;
+  currency?: string;
 }) {
   const [state, formAction] = useActionState(action, { status: "idle" });
   const errors = state.status === "error" ? (state.fieldErrors ?? {}) : {};
@@ -141,8 +143,8 @@ export function ProductForm({
 
       <fieldset className="grid gap-4 sm:grid-cols-2">
         <legend className="mb-2 text-sm font-semibold text-ink">Pricing</legend>
-        {text("cost_price", "Cost price (USD)", { inputMode: "decimal", hint: "Used for inventory value. Leave blank if unknown." })}
-        {text("selling_price", "Selling price (USD)", { inputMode: "decimal" })}
+        {text("cost_price", `Cost price (${currency})`, { inputMode: "decimal", hint: "Used for inventory value. Leave blank if unknown." })}
+        {text("selling_price", `Selling price (${currency})`, { inputMode: "decimal" })}
       </fieldset>
 
       <div className="flex flex-wrap gap-2 border-t border-ink/10 pt-4">

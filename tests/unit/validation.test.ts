@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { friendlyDbError } from "@/lib/errors";
+import { formatMoney } from "@/lib/format";
 import { locationSchema, movementSchema, normalizeBarcode, productSchema, safeSearchTerm } from "@/lib/validation";
 
 const baseProduct = {
@@ -34,6 +35,12 @@ describe("productSchema", () => {
     const r = productSchema.parse({ ...baseProduct, cost_price: "12.5", selling_price: "0" });
     expect(r.cost_price).toBe("12.5");
     expect(r.selling_price).toBe("0");
+  });
+
+  it("accepts currency symbols and thousands separators in prices", () => {
+    expect(productSchema.parse({ ...baseProduct, cost_price: "₹1,250.50" }).cost_price).toBe("1250.50");
+    expect(productSchema.parse({ ...baseProduct, cost_price: "S$ 9.90" }).cost_price).toBe("9.90");
+    expect(productSchema.parse({ ...baseProduct, cost_price: "¥1200" }).cost_price).toBe("1200");
   });
 
   it.each([
@@ -100,6 +107,18 @@ describe("safeSearchTerm", () => {
   it("strips PostgREST filter syntax", () => {
     expect(safeSearchTerm("mug,sku.eq.1)")).toBe("mug sku.eq.1");
     expect(safeSearchTerm(undefined)).toBe("");
+  });
+});
+
+describe("formatMoney", () => {
+  it("uses each currency's symbol and decimals", () => {
+    expect(formatMoney(1234.5, "USD")).toBe("$1,234.50");
+    expect(formatMoney(1234.5, "JPY")).toBe("¥1,235");
+    expect(formatMoney("99.9", "GBP")).toBe("£99.90");
+    expect(formatMoney(10, "EUR")).toBe("€10.00");
+    expect(formatMoney(10, "INR")).toBe("₹10.00");
+    expect(formatMoney(10, "SGD")).toMatch(/^SGD\s10\.00$/); // Intl uses a non-breaking space
+    expect(formatMoney(null, "USD")).toBe("—");
   });
 });
 

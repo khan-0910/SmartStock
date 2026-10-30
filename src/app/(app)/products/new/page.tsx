@@ -38,6 +38,7 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
             locations={(data ?? []) as Pick<Location, "id" | "code" | "name" | "is_active">[]}
             prefillBarcode={prefill}
             cancelHref={prefill ? "/scan" : "/products"}
+            currency={ctx.workspace.currency}
           />
         </Card>
       )}

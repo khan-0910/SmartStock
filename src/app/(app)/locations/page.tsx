@@ -30,8 +30,15 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
   return (
     <>
       <PageHeader
-        title="Locations" kicker="Storage"
+        title="Locations"
+        kicker="Storage"
+        tone="lavender"
         description="Where products are stored. Each product has one primary location. Locations are deactivated, never deleted, so history stays intact."
+        stats={[
+          { label: "Active", value: locations.filter((l) => l.is_active).length },
+          { label: "Inactive", value: locations.filter((l) => !l.is_active).length },
+          { label: "Products assigned", value: locations.reduce((n, l) => n + (l.products?.[0]?.count ?? 0), 0) },
+        ]}
       />
 
       {sp.saved && (

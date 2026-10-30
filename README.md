@@ -97,7 +97,7 @@ cp .env.example .env.local   # then fill in your Supabase URL and anon/publishab
 
 Apply the migrations in `supabase/migrations/` **in order**. Pick one way:
 
-- **Supabase SQL editor:** paste and run `20261029000001_init.sql`, then `20261029000002_demo_data.sql`, then `20261030000003_account_deletion.sql`.
+- **Supabase SQL editor:** paste and run `20261029000001_init.sql`, then `20261029000002_demo_data.sql`, then `20261030000003_account_deletion.sql`, then `20261030000004_currency_and_demo_unload.sql`.
 - **Supabase CLI:** `supabase link --project-ref <ref>` and then `supabase db push`.
 
 ### Auth settings (Supabase dashboard → Authentication)

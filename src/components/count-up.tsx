@@ -1,18 +1,17 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { moneyFormat } from "@/lib/format";
 
 /**
  * Counts from 0 to `value` once on mount (ease-out, ~0.9s). Renders the final
  * value on the server and for reduced-motion users, so there is no flash and
  * screen readers always get the real number.
  */
-export function CountUp({ value, format = "int" }: { value: number; format?: "int" | "money" }) {
+export function CountUp({ value, format = "int", currency = "USD" }: { value: number; format?: "int" | "money"; currency?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const fmt =
-    format === "money"
-      ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
-      : new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+    format === "money" ? moneyFormat(currency) : new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
   useEffect(() => {
     const el = ref.current;
@@ -31,7 +30,7 @@ export function CountUp({ value, format = "int" }: { value: number; format?: "in
     return () => cancelAnimationFrame(raf);
     // fmt is derived from format; value/format are the real inputs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, format]);
+  }, [value, format, currency]);
 
   return (
     <span ref={ref} className="tabular-nums">

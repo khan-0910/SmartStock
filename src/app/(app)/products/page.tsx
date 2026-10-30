@@ -26,7 +26,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   if (lowOnly) query = query.eq("is_low_stock", true);
   if (locationId) query = query.eq("primary_location_id", locationId);
   if (q) query = query.or(`name.ilike.*${q}*,sku.ilike.*${q}*,barcode.ilike.*${q}*`);
-  const { data, count, error } = await query.order("name").range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  const [{ data, count, error }, metricsRes] = await Promise.all([
+    query.order("name").range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1),
+    supabase.rpc("dashboard_metrics", { p_workspace_id: workspace.id }).single(),
+  ]);
+  const metrics = metricsRes.data as { active_products: number; low_stock_count: number; units_on_hand: number } | null;
 
   const products = (data ?? []) as ProductWithLocation[];
   const filters = { q: q || undefined, status: status === "active" ? undefined : status, stock: lowOnly ? "low" : undefined, location: locationId };
@@ -37,8 +41,19 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <PageHeader
-        title="Products" kicker="Catalog"
-        description="Search by name, SKU or barcode."
+        title="Products"
+        kicker="Catalog"
+        tone="sage"
+        description="Everything you stock, with live quantities. Search by name, SKU or barcode."
+        stats={
+          metrics
+            ? [
+                { label: "Active products", value: formatInt(metrics.active_products) },
+                { label: "Units on hand", value: formatInt(metrics.units_on_hand) },
+                { label: "Low stock", value: formatInt(metrics.low_stock_count) },
+              ]
+            : undefined
+        }
         actions={
           <>
             <LinkButton href="/scan" variant="secondary">

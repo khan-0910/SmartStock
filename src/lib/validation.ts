@@ -54,7 +54,8 @@ const optionalPrice = (label: string) =>
   z
     .string()
     .trim()
-    .transform((v) => v.replace(/^\$/, ""))
+    // Accept a leading currency symbol and thousands separators: "₹1,250.50" -> "1250.50".
+    .transform((v) => v.replace(/^(S\$|[$€£¥₹])\s*/, "").replace(/,/g, ""))
     .refine((v) => v === "" || /^\d{1,10}(\.\d{1,2})?$/.test(v), `${label} must be a number like 12.50 (0 or more).`)
     .transform((v) => (v === "" ? null : v));
 

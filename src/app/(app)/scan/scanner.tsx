@@ -32,6 +32,7 @@ export function Scanner() {
   const [cameraError, setCameraError] = useState<CameraErrorKind | "timeout" | null>(null);
   const [result, setResult] = useState<LookupResult | null>(null);
   const [announce, setAnnounce] = useState("");
+  const [mirrored, setMirrored] = useState(false);
   const [pending, startTransition] = useTransition();
 
   // Bumped on every stop/unmount so a camera that finishes starting late is shut down.
@@ -104,6 +105,7 @@ export function Scanner() {
         return;
       }
       scanRef.current = scan;
+      setMirrored(scan.mirrored);
       setCamera("on");
       timeoutRef.current = setTimeout(() => {
         stopCamera();
@@ -189,10 +191,16 @@ export function Scanner() {
             </div>
           )}
           <div className={camera === "off" ? "hidden" : "relative mt-4 overflow-hidden rounded-lg bg-black"}>
-            <video ref={videoRef} className="aspect-video w-full object-cover" muted playsInline aria-label="Camera preview" />
+            <video ref={videoRef} className={`aspect-video w-full object-cover ${mirrored ? "-scale-x-100" : ""}`} muted playsInline aria-label="Camera preview" />
             <div aria-hidden className="pointer-events-none absolute inset-x-8 top-1/2 h-0.5 -translate-y-1/2 bg-red-500/80" />
             {camera === "starting" && <p className="absolute inset-0 flex items-center justify-center text-sm text-white">Starting camera…</p>}
           </div>
+          {camera === "on" && (
+            <p className="mt-3 text-xs text-ink/60">
+              Line the barcode up along the red line. Laptop webcams cannot focus up close: hold it flat about 15–25 cm away, in good light,
+              and keep it still for a second.
+            </p>
+          )}
         </Card>
       </div>
 

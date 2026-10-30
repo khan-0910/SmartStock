@@ -16,7 +16,8 @@ export class CameraError extends Error {
   }
 }
 
-export type CameraScan = { stop: () => void };
+/** mirrored: true for front-facing (laptop) cameras; flip the preview, not the decoding. */
+export type CameraScan = { stop: () => void; mirrored: boolean };
 
 /** Check the environment before asking for permission. */
 export function cameraSupport(): CameraErrorKind | null {
@@ -58,7 +59,7 @@ export async function startCameraScan(video: HTMLVideoElement, onDecode: (text: 
   try {
     stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
-      video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
     });
   } catch (err) {
     throw mapError(err);
@@ -73,6 +74,13 @@ export async function startCameraScan(video: HTMLVideoElement, onDecode: (text: 
     for (const track of stream.getTracks()) track.stop();
     video.srcObject = null;
   };
+
+  const track = stream.getVideoTracks()[0];
+  // Continuous autofocus where supported (not in the standard TS types yet).
+  await track?.applyConstraints({ advanced: [{ focusMode: "continuous" } as MediaTrackConstraintSet] }).catch(() => undefined);
+  const facing = track?.getSettings().facingMode;
+  // Laptops usually report "user" or nothing; phones with a rear camera report "environment".
+  const mirrored = facing !== "environment";
 
   try {
     video.muted = true;
@@ -100,26 +108,35 @@ export async function startCameraScan(video: HTMLVideoElement, onDecode: (text: 
     throw new CameraError("failed", "The barcode decoder could not start.");
   }
 
+  const tryDecode = (sx: number, sy: number, sw: number, sh: number, maxWidth: number) => {
+    const scale = Math.min(1, maxWidth / sw);
+    canvas.width = Math.round(sw * scale);
+    canvas.height = Math.round(sh * scale);
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+    try {
+      return reader.decodeFromCanvas(canvas).getText();
+    } catch {
+      return null; // No readable barcode in this region.
+    }
+  };
+
+  let frame = 0;
   const tick = () => {
     if (stopped) return;
     const w = video.videoWidth;
     const h = video.videoHeight;
     if (w && h) {
-      // Decode a downscaled frame: plenty for 1D barcodes and much faster.
-      const scale = Math.min(1, 960 / w);
-      canvas.width = Math.round(w * scale);
-      canvas.height = Math.round(h * scale);
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      try {
-        const text = reader.decodeFromCanvas(canvas).getText();
-        if (!stopped) onDecode(text);
-      } catch {
-        // No readable barcode in this frame.
-      }
+      // 1) The band around the on-screen guide line at (near) full resolution:
+      //    small, soft barcodes from fixed-focus laptop webcams keep their detail.
+      // 2) Every other frame, the whole picture downscaled, for barcodes held elsewhere.
+      const text =
+        tryDecode(w * 0.08, h * 0.3, w * 0.84, h * 0.4, 1600) ?? (frame % 2 === 0 ? tryDecode(0, 0, w, h, 1024) : null);
+      frame += 1;
+      if (text && !stopped) onDecode(text);
     }
-    timer = setTimeout(tick, 120);
+    timer = setTimeout(tick, 100);
   };
   tick();
 
-  return { stop };
+  return { stop, mirrored };
 }

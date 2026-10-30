@@ -1,13 +1,33 @@
 import type { MovementType } from "./types";
 
-const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 const integer = new Intl.NumberFormat("en-US");
 const dateTime = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" });
 
-export function formatMoney(value: number | string | null | undefined) {
+export const CURRENCIES = [
+  { code: "USD", label: "US dollar" },
+  { code: "EUR", label: "Euro" },
+  { code: "GBP", label: "British pound" },
+  { code: "JPY", label: "Japanese yen" },
+  { code: "INR", label: "Indian rupee" },
+  { code: "SGD", label: "Singapore dollar" },
+] as const;
+export type Currency = (typeof CURRENCIES)[number]["code"];
+
+const moneyFormats = new Map<string, Intl.NumberFormat>();
+/** Intl picks the right symbol and decimals per currency (e.g. JPY has none). */
+export function moneyFormat(currency: string = "USD") {
+  let f = moneyFormats.get(currency);
+  if (!f) {
+    f = new Intl.NumberFormat("en-US", { style: "currency", currency });
+    moneyFormats.set(currency, f);
+  }
+  return f;
+}
+
+export function formatMoney(value: number | string | null | undefined, currency: string = "USD") {
   if (value === null || value === undefined || value === "") return "—";
   const n = typeof value === "string" ? Number(value) : value;
-  return Number.isFinite(n) ? money.format(n) : "—";
+  return Number.isFinite(n) ? moneyFormat(currency).format(n) : "—";
 }
 
 export function formatInt(value: number | string | null | undefined) {

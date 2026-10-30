@@ -9,7 +9,7 @@ import { friendlyDbError } from "@/lib/errors";
 import { formatInt } from "@/lib/format";
 import { MOVEMENT_SELECT, PRODUCT_SELECT } from "@/lib/queries";
 import type { Movement, ProductWithLocation } from "@/lib/types";
-import { loadDemoData } from "../products/actions";
+import { loadDemoData, unloadDemoData } from "../products/actions";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -53,12 +53,14 @@ export default async function DashboardPage() {
   const ctx = await getContext();
   const { supabase, workspace } = ctx;
 
-  const [metricsRes, lowRes, movesRes, locCountRes] = await Promise.all([
+  const [metricsRes, lowRes, movesRes, locCountRes, demoRes] = await Promise.all([
     supabase.rpc("dashboard_metrics", { p_workspace_id: workspace.id }).single(),
     supabase.from("products").select(PRODUCT_SELECT).eq("workspace_id", workspace.id).eq("is_low_stock", true).order("quantity_on_hand").limit(6),
     supabase.from("stock_movements").select(MOVEMENT_SELECT).eq("workspace_id", workspace.id).order("created_at", { ascending: false }).limit(8),
     supabase.from("locations").select("id", { count: "exact", head: true }).eq("workspace_id", workspace.id),
+    supabase.from("products").select("id", { count: "exact", head: true }).eq("workspace_id", workspace.id).like("sku", "DEMO-%"),
   ]);
+  const hasDemo = (demoRes.count ?? 0) > 0;
 
   const error = metricsRes.error ?? lowRes.error ?? movesRes.error;
   if (error) {
@@ -142,6 +144,25 @@ export default async function DashboardPage() {
         </div>
       </section>
 
+      {hasDemo && isOwner(ctx) && (
+        <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-dashed border-brand-600/30 bg-white/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-ink/70">
+            <span className="font-semibold text-ink">You are looking at demo data.</span> Remove it when you are ready to add your own products.
+          </p>
+          <ActionButton
+            action={unloadDemoData}
+            label="Remove demo data"
+            pendingLabel="Removing…"
+            confirm={{
+              title: "Remove demo data?",
+              body: "This deletes the 10 demo products, their movement history, and the demo locations if nothing else uses them. Your own products and locations are kept.",
+              confirmLabel: "Remove demo data",
+              danger: true,
+            }}
+          />
+        </div>
+      )}
+
       <div className="stagger-children mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Metric label="Active products" value={Number(m.active_products)} href="/products" tone="sage" icon={ICONS.box} />
         <Metric label="Units on hand" value={Number(m.units_on_hand)} note="Sum across all units (each, box, roll…)." tone="lavender" icon={ICONS.stack} />
@@ -149,6 +170,7 @@ export default async function DashboardPage() {
           label="Inventory value (at cost)"
           value={Number(m.inventory_value)}
           money
+          currency={workspace.currency}
           tone="apricot"
           icon={ICONS.coin}
           note={missingCost > 0 ? `Excludes ${missingCost} product${missingCost === 1 ? "" : "s"} with no cost price.` : "Quantity × cost price, active products."}
@@ -263,6 +285,7 @@ function Metric({
   tone,
   icon,
   money,
+  currency,
 }: {
   label: string;
   value: number;
@@ -271,6 +294,7 @@ function Metric({
   tone: Tone;
   icon: string;
   money?: boolean;
+  currency?: string;
 }) {
   const body = (
     <>
@@ -281,7 +305,7 @@ function Metric({
         </span>
       </div>
       <p className="mt-3 font-display text-3xl font-bold tracking-tight">
-        <CountUp value={value} format={money ? "money" : "int"} />
+        <CountUp value={value} format={money ? "money" : "int"} currency={currency} />
       </p>
       {note && <p className="mt-1.5 text-xs text-ink/60">{note}</p>}
     </>

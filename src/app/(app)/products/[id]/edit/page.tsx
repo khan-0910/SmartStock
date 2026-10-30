@@ -33,7 +33,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         <Alert tone="warning">Only workspace owners can edit products.</Alert>
       ) : (
         <Card className="max-w-3xl">
-          <ProductForm action={saveProduct.bind(null, product.id)} product={product} locations={locations} cancelHref={`/products/${product.id}`} />
+          <ProductForm action={saveProduct.bind(null, product.id)} product={product} locations={locations} cancelHref={`/products/${product.id}`} currency={ctx.workspace.currency} />
         </Card>
       )}
     </>

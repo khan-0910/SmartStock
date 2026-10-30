@@ -93,9 +93,9 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
               <dt className="text-ink/60">Barcode</dt>
               <dd className="font-mono text-xs leading-5">{product.barcode ?? <span className="font-sans text-ink/60">None</span>}</dd>
               <dt className="text-ink/60">Cost price</dt>
-              <dd>{formatMoney(product.cost_price)}</dd>
+              <dd>{formatMoney(product.cost_price, ctx.workspace.currency)}</dd>
               <dt className="text-ink/60">Selling price</dt>
-              <dd>{formatMoney(product.selling_price)}</dd>
+              <dd>{formatMoney(product.selling_price, ctx.workspace.currency)}</dd>
             </dl>
             {product.description && <p className="mt-4 whitespace-pre-line border-t border-ink/10 pt-4 text-sm text-ink/80">{product.description}</p>}
           </Card>

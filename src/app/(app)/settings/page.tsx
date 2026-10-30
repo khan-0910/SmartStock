@@ -4,6 +4,7 @@ import { ActionButton } from "@/components/action-button";
 import { buttonClass, Card, PageHeader } from "@/components/ui";
 import { getContext, isOwner } from "@/lib/auth";
 import { signOut } from "../../(auth)/actions";
+import { loadDemoData, unloadDemoData } from "../products/actions";
 import { deleteAccount } from "./actions";
 import { WorkspaceForm } from "./workspace-form";
 
@@ -11,13 +12,26 @@ export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
   const ctx = await getContext();
+  const [{ count: demoCount }, { count: productCount }] = await Promise.all([
+    ctx.supabase.from("products").select("id", { count: "exact", head: true }).eq("workspace_id", ctx.workspace.id).like("sku", "DEMO-%"),
+    ctx.supabase.from("products").select("id", { count: "exact", head: true }).eq("workspace_id", ctx.workspace.id),
+  ]);
   return (
     <>
-      <PageHeader title="Settings" kicker="Account" />
+      <PageHeader
+        title="Settings"
+        kicker="Account"
+        tone="lavender"
+        description="Workspace details, currency, your data and your account."
+        stats={[
+          { label: "Role", value: <span className="capitalize">{ctx.workspace.role}</span> },
+          { label: "Currency", value: ctx.workspace.currency },
+        ]}
+      />
       <div className="grid max-w-2xl gap-6">
         <Card>
           <h2 className="mb-4 font-semibold">Workspace</h2>
-          {isOwner(ctx) ? <WorkspaceForm name={ctx.workspace.name} /> : <p className="text-sm">{ctx.workspace.name}</p>}
+          {isOwner(ctx) ? <WorkspaceForm name={ctx.workspace.name} currency={ctx.workspace.currency} /> : <p className="text-sm">{ctx.workspace.name}</p>}
         </Card>
         <Card>
           <h2 className="mb-2 font-semibold">Account</h2>
@@ -43,6 +57,32 @@ export default async function SettingsPage() {
             Download my data
           </a>
         </Card>
+        {isOwner(ctx) && (
+          <Card>
+            <h2 className="mb-1 font-semibold">Demo data</h2>
+            {demoCount ? (
+              <>
+                <p className="mb-4 text-sm text-ink/70">
+                  Your workspace has {demoCount} demo products. Removing them also deletes their movement history and any demo locations nothing
+                  else uses. Your own products and locations are kept.
+                </p>
+                <ActionButton
+                  action={unloadDemoData}
+                  label="Remove demo data"
+                  pendingLabel="Removing…"
+                  confirm={{ title: "Remove demo data?", body: "The 10 demo products and their history will be deleted. This cannot be undone.", confirmLabel: "Remove demo data", danger: true }}
+                />
+              </>
+            ) : productCount ? (
+              <p className="text-sm text-ink/70">No demo data in this workspace. Demo data can only be loaded into an empty workspace.</p>
+            ) : (
+              <>
+                <p className="mb-4 text-sm text-ink/70">Load 10 fictional products, 4 locations and sample movements to explore the app.</p>
+                <ActionButton action={loadDemoData} label="Load demo data" pendingLabel="Loading…" />
+              </>
+            )}
+          </Card>
+        )}
         <Card className="border-coral/40">
           <h2 className="mb-1 font-semibold text-coral">Delete account</h2>
           <p className="mb-4 text-sm text-ink/70">

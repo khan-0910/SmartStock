@@ -281,6 +281,46 @@ describe("account deletion", () => {
   });
 });
 
+describe("currency", () => {
+  it("defaults to USD, can be changed by the owner, and only to supported codes", async () => {
+    const [ws] = await as(db, ALICE, () => rows<{ currency: string }>("select * from public.ensure_workspace()"));
+    expect(ws.currency).toBe("USD");
+    await as(db, ALICE, () => rows("update public.workspaces set currency = 'JPY' where id = $1", [aliceWs]));
+    const [after] = await as(db, ALICE, () => rows<{ currency: string }>("select * from public.ensure_workspace()"));
+    expect(after.currency).toBe("JPY");
+    await expect(as(db, ALICE, () => rows("update public.workspaces set currency = 'XYZ' where id = $1", [aliceWs]))).rejects.toThrow();
+    await as(db, ALICE, () => rows("update public.workspaces set currency = 'USD' where id = $1", [aliceWs]));
+  });
+});
+
+describe("unload demo data", () => {
+  it("removes demo products, their history and unused demo locations, and nothing else", async () => {
+    const ERIN = "00000000-0000-4000-8000-00000000000e";
+    await createUser(db, ERIN);
+    const ws = await as(db, ERIN, async () => (await rows<{ workspace_id: string }>("select * from public.ensure_workspace()"))[0].workspace_id);
+    await as(db, ERIN, () => rows("select public.load_demo_data()"));
+    // The owner's own product and location (added after the demo) must survive.
+    const mine = await newProduct(ERIN, ws, "MY-OWN-1");
+    await move(ERIN, mine, "stock_in", 7);
+    await as(db, ERIN, () => rows("insert into public.locations (workspace_id, code, name) values ($1, 'MY-BIN', 'My bin')", [ws]));
+
+    const [{ unload_demo_data }] = await as(db, ERIN, () => rows<{ unload_demo_data: number }>("select public.unload_demo_data()"));
+    expect(unload_demo_data).toBe(10);
+
+    const products = await rows<{ sku: string }>("select sku from public.products where workspace_id = $1", [ws]);
+    expect(products.map((p) => p.sku)).toEqual(["MY-OWN-1"]);
+    const locs = await rows<{ code: string }>("select code from public.locations where workspace_id = $1", [ws]);
+    expect(locs.map((l) => l.code)).toEqual(["MY-BIN"]);
+    expect(await movementCount(mine)).toBe(1);
+    // Can load again afterwards? No: the workspace still has a product (by design).
+    await expect(as(db, ERIN, () => rows("select public.load_demo_data()"))).rejects.toThrow(/WORKSPACE_NOT_EMPTY/);
+  });
+
+  it("is not callable anonymously", async () => {
+    await expect(as(db, null, () => rows("select public.unload_demo_data()"))).rejects.toThrow(/permission denied/);
+  });
+});
+
 describe("demo data", () => {
   it("loads once into an empty workspace through the ledger", async () => {
     const CAROL = "00000000-0000-4000-8000-00000000000c";

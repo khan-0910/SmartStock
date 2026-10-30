@@ -6,7 +6,7 @@ import { signOut } from "../(auth)/actions";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const ctx = await getContext();
   return (
-    <div className="min-h-dvh bg-canvas">
+    <div className="app-theme min-h-dvh bg-canvas text-ink">
       <SmoothScroll />
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
         Skip to content

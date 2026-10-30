@@ -37,6 +37,36 @@
   color-scheme: light;
 }
 
+/*
+  Signed-in app theme: a soft pastel trio. Lavender is the base, sage and
+  peach are the two contrast colours for icons and sections. Tailwind
+  utilities read these variables, so remapping them here restyles every app
+  page without touching the marketing site.
+*/
+.app-theme {
+  --color-canvas: #f4f2fa; /* lavender mist */
+  --color-paper: #fbfaff;
+  --color-paper-deep: #ebe7f7;
+  --color-ink: #2d2a3e; /* soft aubergine text, not black */
+  --color-ink-soft: #4b4763;
+
+  --color-brand-50: #f1edfc;
+  --color-brand-100: #e1daf7;
+  --color-brand-600: #7c6bc4;
+  --color-brand-700: #5f4fa8;
+  --color-brand-800: #4a3d86;
+
+  --color-lilac: #dcd4f6; /* lavender */
+  --color-lime: #c4e4d2; /* sage (primary contrast) */
+  --color-teal: #8fc7a8; /* deeper sage */
+  --color-coral: #f6bfa8; /* peach (secondary contrast) */
+  --color-sun: #f8d9b0; /* apricot */
+
+  --sage-ink: #2f6b52;
+  --peach-ink: #a24a2c;
+  --lav-ink: #5f4fa8;
+}
+
 body {
   @apply bg-paper text-ink antialiased;
 }

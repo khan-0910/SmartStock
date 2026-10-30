@@ -50,13 +50,13 @@ function NavBody({
 }) {
   return (
     <>
-      <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-2.5">
+      <div className="flex items-center gap-3 rounded-xl border border-ink/[0.07] bg-white p-2.5 shadow-[0_1px_2px_rgba(45,42,62,0.05)]">
         <span aria-hidden className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-lime font-display text-sm font-bold text-ink">
           {workspaceName.trim().charAt(0).toUpperCase() || "W"}
         </span>
         <span className="min-w-0">
-          <span className="block truncate text-sm font-semibold text-paper">{workspaceName}</span>
-          <span className="block text-xs text-paper/50 capitalize">{role}</span>
+          <span className="block truncate text-sm font-semibold text-ink">{workspaceName}</span>
+          <span className="block text-xs text-ink/50 capitalize">{role}</span>
         </span>
       </div>
 
@@ -64,7 +64,7 @@ function NavBody({
         href="/scan"
         onClick={onNavigate}
         aria-current={path === "/scan" ? "page" : undefined}
-        className="mt-4 flex h-10 items-center justify-center gap-2 rounded-lg bg-lime text-sm font-semibold text-ink transition-colors hover:bg-[#e4ff7a]"
+        className="mt-4 flex h-10 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-semibold text-paper transition-colors hover:bg-ink-soft"
       >
         <Icon d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3M8 8v8M11 8v8M14 8v8M17 8v8" />
         Scan barcode
@@ -73,7 +73,7 @@ function NavBody({
       <nav aria-label="Main" className="mt-6 flex-1 space-y-6">
         {SECTIONS.map((section) => (
           <div key={section.title}>
-            <p className="px-3 text-[11px] font-semibold tracking-[0.08em] text-paper/40 uppercase">{section.title}</p>
+            <p className="px-3 text-[11px] font-semibold tracking-[0.08em] text-ink/40 uppercase">{section.title}</p>
             <ul className="mt-2 space-y-0.5">
               {section.items.map((item) => {
                 const active = path === item.href || path.startsWith(`${item.href}/`);
@@ -85,11 +85,11 @@ function NavBody({
                       aria-current={active ? "page" : undefined}
                       className={cx(
                         "relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors",
-                        active ? "bg-white/[0.08] text-paper" : "text-paper/60 hover:bg-white/[0.05] hover:text-paper",
+                        active ? "bg-white text-ink shadow-[0_1px_2px_rgba(45,42,62,0.06)]" : "text-ink/60 hover:bg-white/60 hover:text-ink",
                       )}
                     >
-                      {active && <span aria-hidden className="absolute inset-y-2 left-0 w-[3px] rounded-full bg-lime" />}
-                      <Icon d={item.icon} className={active ? "text-lime" : undefined} />
+                      {active && <span aria-hidden className="absolute inset-y-2 left-0 w-[3px] rounded-full bg-teal" />}
+                      <Icon d={item.icon} className={active ? "text-(--sage-ink)" : undefined} />
                       {item.label}
                     </Link>
                   </li>
@@ -135,25 +135,28 @@ export function AppNav({
 
   const brand = (
     <Link href="/" title="SmartStock homepage" className="flex items-center gap-2.5 rounded-md">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/icon.svg" alt="" width={28} height={28} />
-      <span className="font-display text-[17px] font-bold tracking-tight text-paper">SmartStock</span>
+      <span aria-hidden className="inline-flex size-7 items-center justify-center rounded-lg bg-ink text-paper">
+        <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinejoin="round">
+          <path d="M4 7.5L12 3l8 4.5v9L12 21l-8-4.5zM4 7.5l8 4.5 8-4.5M12 12v9" />
+        </svg>
+      </span>
+      <span className="font-display text-[17px] font-bold tracking-tight text-ink">SmartStock</span>
     </Link>
   );
 
   const account = (
-    <div className="flex items-center gap-3 border-t border-white/10 pt-4">
-      <span aria-hidden className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-lilac text-xs font-bold text-ink">
+    <div className="flex items-center gap-3 border-t border-ink/[0.07] pt-4">
+      <span aria-hidden className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-coral text-xs font-bold text-ink">
         {email.charAt(0).toUpperCase()}
       </span>
-      <span className="min-w-0 flex-1 truncate text-xs text-paper/70" title={email}>
+      <span className="min-w-0 flex-1 truncate text-xs text-ink/60" title={email}>
         {email}
       </span>
       <form action={signOutAction}>
         <button
           type="submit"
           title="Sign out"
-          className="inline-flex size-8 items-center justify-center rounded-lg text-paper/60 transition-colors hover:bg-white/10 hover:text-paper"
+          className="inline-flex size-8 items-center justify-center rounded-lg text-ink/50 transition-colors hover:bg-white hover:text-ink"
         >
           <span className="sr-only">Sign out</span>
           <Icon d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3M10 17l5-5-5-5M15 12H4" />
@@ -165,14 +168,14 @@ export function AppNav({
   return (
     <>
       {/* Desktop sidebar. z-40 keeps it above the (positioned) page content. */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/5 bg-ink px-4 py-5 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-ink/[0.06] bg-paper-deep/70 px-4 py-5 lg:flex">
         <div className="px-1 pb-5">{brand}</div>
         <NavBody path={path} workspaceName={workspaceName} role={role} />
         {account}
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-40 flex h-14 items-center justify-between bg-ink px-4 lg:hidden">
+      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-ink/[0.06] bg-paper-deep px-4 lg:hidden">
         {brand}
         <button
           ref={toggleRef}
@@ -180,7 +183,7 @@ export function AppNav({
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-controls="mobile-nav"
-          className="-mr-2 inline-flex size-10 items-center justify-center rounded-lg text-paper hover:bg-white/10"
+          className="-mr-2 inline-flex size-10 items-center justify-center rounded-lg text-ink hover:bg-white"
         >
           <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
           <svg aria-hidden viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
@@ -189,7 +192,7 @@ export function AppNav({
         </button>
       </header>
       {open && (
-        <div ref={panelRef} id="mobile-nav" data-lenis-prevent className="fixed inset-x-0 top-14 bottom-0 z-40 flex flex-col overflow-y-auto bg-ink p-4 lg:hidden">
+        <div ref={panelRef} id="mobile-nav" data-lenis-prevent className="fixed inset-x-0 top-14 bottom-0 z-40 flex flex-col overflow-y-auto bg-paper-deep p-4 lg:hidden">
           <NavBody path={path} workspaceName={workspaceName} role={role} onNavigate={() => setOpen(false)} />
           <div className="mt-6">{account}</div>
         </div>

@@ -142,7 +142,7 @@ export function EmptyState({ title, children, actions }: { title: string; childr
 
 export function LowStockBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md bg-sun/30 px-2 py-0.5 text-xs font-semibold text-[#7a5300]">
+    <span className="inline-flex items-center gap-1 rounded-md bg-coral/45 px-2 py-0.5 text-xs font-semibold text-(--peach-ink)">
       <span aria-hidden>▼</span> Low stock
     </span>
   );
@@ -150,7 +150,7 @@ export function LowStockBadge() {
 
 export function StatusBadge({ active, activeLabel = "Active", inactiveLabel = "Archived" }: { active: boolean; activeLabel?: string; inactiveLabel?: string }) {
   return active ? (
-    <span className="inline-flex rounded-md bg-teal/15 px-2 py-0.5 text-xs font-semibold text-[#0f6b62]">{activeLabel}</span>
+    <span className="inline-flex rounded-md bg-lime/60 px-2 py-0.5 text-xs font-semibold text-(--sage-ink)">{activeLabel}</span>
   ) : (
     <span className="inline-flex rounded-md bg-ink/[0.06] px-2 py-0.5 text-xs font-semibold text-ink/70">{inactiveLabel}</span>
   );
@@ -160,7 +160,7 @@ export function StatusBadge({ active, activeLabel = "Active", inactiveLabel = "A
 export function DeltaBadge({ delta }: { delta: number }) {
   const up = delta > 0;
   return (
-    <span className={cx("inline-flex items-center gap-1 font-semibold tabular-nums", up ? "text-emerald-700" : "text-red-700")}>
+    <span className={cx("inline-flex items-center gap-1 font-semibold tabular-nums", up ? "text-(--sage-ink)" : "text-(--peach-ink)")}>
       <span aria-hidden>{up ? "▲" : "▼"}</span>
       <span>{formatDelta(delta)}</span>
       <span className="sr-only">{up ? "added" : "removed"}</span>
@@ -170,9 +170,9 @@ export function DeltaBadge({ delta }: { delta: number }) {
 
 export function MovementTypeBadge({ type }: { type: MovementType }) {
   const styles: Record<MovementType, string> = {
-    stock_in: "bg-teal/15 text-[#0f6b62]",
-    stock_out: "bg-coral/15 text-[#a3301a]",
-    adjustment: "bg-brand-50 text-brand-700",
+    stock_in: "bg-lime/60 text-(--sage-ink)",
+    stock_out: "bg-coral/45 text-(--peach-ink)",
+    adjustment: "bg-lilac/70 text-(--lav-ink)",
   };
   return <span className={cx("inline-flex rounded-md px-2 py-0.5 text-xs font-semibold", styles[type])}>{MOVEMENT_LABELS[type]}</span>;
 }
